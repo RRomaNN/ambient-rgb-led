@@ -28,6 +28,7 @@
 
 #define PATTERN_MAX_COUNT_EEPROM0 4
 #define PATTERN_MAX_INDEX 3 // Pattern count - 1
+#define MAX_PREDEFINED_COLORS 32
 
 #define MODIFY_BUTTON_PIN A0
 #define AMP_METER_PIN A1
@@ -179,7 +180,7 @@ void transitState(enum buttonType button)
       switch(button)
       {
         case selectButton:
-          color_index = color_index == 63 ? 0 : color_index + 1;
+          color_index = color_index == MAX_PREDEFINED_COLORS - 1 ? 0 : color_index + 1;
           readColors();
           break;
         case actionButton:
