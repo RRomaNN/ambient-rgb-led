@@ -38,6 +38,17 @@ volatile char pattern_preview_line2[21];
 volatile bool isSelectPressed = false;
 volatile bool isActionPressed = false;
 
+volatile byte main_red = 0xFF;
+volatile byte main_green = 0xFF;
+volatile byte main_blue = 0xFF;
+volatile char main_color_hex[7];
+
+volatile byte secondary_red = 0x00;
+volatile byte secondary_green = 0x00;
+volatile byte secondary_blue = 0x00;
+volatile char secondary_color_hex[7];
+
+
 void setup() 
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -179,13 +190,16 @@ void render()
       lcd.print(" Next");
       break;
     case colorSelect:
+      setColorStrings();
       lcd.print("Select colors       ");
       lcd.setCursor(0, 1);
-      lcd.print("RGB1: ");
-      lcd.print("ABCDEF");
+      lcd.print("RGB M: ");
+      lcd.print((char*)main_color_hex);
+      lcd.print("       ");
       lcd.setCursor(0, 2);
-      lcd.print("RGB2: ");
-      lcd.print("789ABC");
+      lcd.print("RGB S: ");
+      lcd.print((char*)secondary_color_hex);
+      lcd.print("       ");
       renderChoice("Select          Next");
       break;
     case validate:
@@ -241,6 +255,26 @@ void printIterationNumber()
     lcd.print(" ");
     lcd.print(pattern_preview_line_offset);
   }
+}
+
+void setColorStrings()
+{
+  byte color_main_bytes[3] = {main_red, main_green, main_blue};
+  byte color_secondary_bytes[3] = {secondary_red, secondary_green, secondary_blue};
+  arrayToString(color_main_bytes, 3, main_color_hex);
+  arrayToString(color_secondary_bytes, 3, secondary_color_hex);
+}
+
+void arrayToString(byte array[], unsigned int len, char buffer[])
+{
+    for (unsigned int i = 0; i < len; i++)
+    {
+        byte nib1 = (array[i] >> 4) & 0x0F;
+        byte nib2 = (array[i] >> 0) & 0x0F;
+        buffer[i*2+0] = nib1  < 0xA ? '0' + nib1  : 'A' + nib1  - 0xA;
+        buffer[i*2+1] = nib2  < 0xA ? '0' + nib2  : 'A' + nib2  - 0xA;
+    }
+    buffer[len*2] = '\0';
 }
 
 void renderChoice(char* bottomLine)
