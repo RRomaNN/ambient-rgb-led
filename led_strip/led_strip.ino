@@ -433,13 +433,11 @@ void printNumber(byte number)
 void displayColorStrings()
 {
   lcd.setCursor(0, 1);
-  lcd.print("RGB M: ");
+  lcd.print("RGB Main      ");
   lcd.print((char*)main_color_hex);
-  lcd.print("       ");
   lcd.setCursor(0, 2);
-  lcd.print("RGB S: ");
+  lcd.print("RGB Secondary ");
   lcd.print((char*)secondary_color_hex);
-  lcd.print("       ");
 }
 
 void previewColors()
