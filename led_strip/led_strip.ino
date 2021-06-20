@@ -23,18 +23,20 @@
 #define EEPROM0_ADDRESS 0x50
 #define EEPROM1_ADDRESS 0x51
 
-#define MAX_LED_NUM 225
 #define MAX_IMG_LEN 225
+#define ARRAY_PATTERN_LEN 32
 
 #define PATTERN_MAX_COUNT_EEPROM0 4
 #define PATTERN_MAX_INDEX 3 // Pattern count - 1
 #define MAX_PREDEFINED_COLORS 32
 
 #define MODIFY_BUTTON_PIN A0
-#define AMP_METER_PIN A1
+#define AMPERE_METER_PIN A1
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+
 Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel led_array(LED_MAIN_ARRAY_PIXEL_NUM, LED_MAIN_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
 
 enum stateType {patternSelect, colorSelect, editMainRColor, editMainGColor, editMainBColor, editSecondaryRColor, editSecondaryGColor, editSecondaryBColor, validate, pause, resumeBack};
 enum buttonType {selectButton, actionButton, modifyButton};
@@ -44,7 +46,7 @@ volatile enum stateType state = patternSelect;
 volatile int pattern_index = 0;
 volatile int pattern_preview_line_offset = 0;
 
-volatile char schema_name[11] = "N/A";
+volatile char schema_name[12] = "N/A";
 
 volatile char pattern_preview_line0[21];
 volatile char pattern_preview_line1[21];
@@ -69,6 +71,12 @@ volatile int color_up_momentum = 0;
 volatile int color_down_momentum = 0;
 volatile byte color_index = 0;
 
+volatile byte pattern_line_offset = 0;
+volatile int pattern_line_interval = 30; // todo: make ui to configure it
+volatile int pattern_count = 0;
+volatile byte current_line_data[ARRAY_PATTERN_LEN];
+volatile byte next_line_data[ARRAY_PATTERN_LEN];
+
 void setup() 
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -91,9 +99,14 @@ void setup()
   preview_led_array.begin();
   preview_led_array.setBrightness(LED_ARRAY_BRIGHTNESS);
 
+  led_array.begin();
+  led_array.setBrightness(LED_ARRAY_BRIGHTNESS);
+
   readCurrentSchemaName(pattern_index);
   readCurrentPatternPreview(pattern_index, pattern_preview_line_offset);
+  
   cancelPreviewColors();
+  turnOffLedArray();
 }
 
 void loop() 
@@ -128,7 +141,80 @@ void loop()
     cancelPreviewColors();
   }    
 
+  if(state == pause)
+  {
+    digitalWrite(LED_BUILTIN, HIGH);
+    renderLedArray();
+  }
+
   delay(100);
+}
+
+void renderLedArray()
+{
+  if(pattern_count == pattern_line_interval)
+  {  
+    pattern_count = 0;   
+    
+    //update pattern
+    pattern_line_offset = pattern_line_offset == MAX_IMG_LEN - 1 ? 0 : pattern_line_offset + 1;
+
+    int patternBaseAddress = pattern_index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
+    
+    int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + pattern_line_offset); //32 (256/8) * (225 + 1 for header) + header row;
+    for(int i = 0; i < ARRAY_PATTERN_LEN; i++)
+      current_line_data[i] = readEEPROM(EEPROM0_ADDRESS, patternAddress + i);
+      
+    int nextPatternOffset = pattern_line_offset == MAX_IMG_LEN - 1 ? 0 : pattern_line_offset + 1;
+    
+    patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + nextPatternOffset);
+    for(int i = 0; i < ARRAY_PATTERN_LEN; i++)
+      next_line_data[i] = readEEPROM(EEPROM0_ADDRESS, patternAddress + i);
+  }
+  else
+    pattern_count++;
+
+  setLedArrayColors();
+}
+
+void setLedArrayColors()
+{
+  float newFraction = (float)pattern_count / pattern_line_interval;
+  float oldFraction = 1 - newFraction;
+  
+  for(byte i = 0; i < LED_MAIN_ARRAY_PIXEL_NUM; i++)
+  {
+    bool currentValue = current_line_data[i / 8] & (1 << i % 8);
+    bool nextValue = next_line_data[i / 8] & (1 << i % 8);
+
+    if(currentValue && nextValue)
+    {
+      led_array.setPixelColor(i, led_array.Color(main_red, main_green, main_blue));  
+      continue;
+    }
+
+    if(!currentValue && !nextValue)
+    {
+      led_array.setPixelColor(i, led_array.Color(secondary_red, secondary_green, secondary_blue));  
+      continue;
+    }
+
+    byte red, green, blue;
+    if(currentValue && !nextValue)
+    {
+      red = main_red * oldFraction + secondary_red * newFraction;
+      green = main_green * oldFraction + secondary_green * newFraction;
+      blue = main_blue * oldFraction + secondary_blue * newFraction; 
+    }
+    else
+    {
+      red = main_red * newFraction + secondary_red * oldFraction;
+      green = main_green * newFraction + secondary_green * oldFraction;
+      blue = main_blue * newFraction + secondary_blue * oldFraction; 
+    }
+    led_array.setPixelColor(i, led_array.Color(red, green, blue)); 
+  }
+  led_array.show();
 }
 
 void processModifyButton()
@@ -280,6 +366,8 @@ void transitState(enum buttonType button)
       switch(button)
       {
         case selectButton:
+          pattern_count = pattern_line_interval;
+          pattern_line_offset = MAX_IMG_LEN - 1;
           state = pause;
           break;
         case actionButton:
@@ -291,11 +379,21 @@ void transitState(enum buttonType button)
       switch(button)
       {
         case selectButton:
-          //go ahead
-          state = validate;
+          state = resumeBack;
           break;
         case actionButton:
-          //return back
+          turnOffLedArray();
+          state = patternSelect;
+          break;
+      }
+      break;
+    case resumeBack:
+      switch(button)
+      {
+        case selectButton:
+          state = pause;
+          break;
+        case actionButton:
           state = patternSelect;
           break;
       }
@@ -392,26 +490,28 @@ void render()
       renderChoice("Apply         Cancel");
       break;
     case pause:
-      lcd.print("PATTERN: ");
+      lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
       lcd.setCursor(0, 1);
-      lcd.print("ITERATION: ");
-      lcd.print(123);
+      lcd.print("Line: ");
+      print3dNumber(pattern_line_offset);
+      lcd.print("           ");
       lcd.setCursor(0, 2);
-      lcd.print("CURRENT: ");
+      lcd.print("Current: ");
       lcd.print("3.5A");
-      renderChoice("PAUSE            OFF");
+      renderChoice("Pause            Off");
       break;
     case resumeBack:
-      lcd.print("PATTERN: ");
+      lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
       lcd.setCursor(0, 1);
-      lcd.print("ITERATION: ");
-      lcd.print(123);
+      lcd.print("Iteration: ");
+      print3dNumber(pattern_line_offset);
+      lcd.print("      ");
       lcd.setCursor(0, 2);
-      lcd.print("CURRENT: ");
+      lcd.print("Current: ");
       lcd.print("3.5A");
-      renderChoice("RESUME           OFF");
+      renderChoice("Resume           Off");
       break;
   } 
 }
@@ -421,6 +521,15 @@ void printNumber(byte number)
   if(number < 10)
     lcd.print(" ");
   lcd.print(number);
+}
+
+void print3dNumber(byte number)
+{
+  lcd.print(number);
+  if(number < 10)
+    lcd.print(" ");
+  if(number < 100)
+    lcd.print(" ");
 }
 
 void displayColorStrings()
@@ -448,9 +557,16 @@ void cancelPreviewColors()
   preview_led_array.show();
 }
 
+void turnOffLedArray()
+{
+  for(byte i = 0; i < LED_MAIN_ARRAY_PIXEL_NUM; i++)
+    led_array.setPixelColor(i, led_array.Color(0x00, 0x00, 0x00));
+  led_array.show();
+}
+
 void readColors()
 {
-  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * 32 * (MAX_IMG_LEN + 1) + 6 * color_index; // 4 x schema + RGBRGB x index
+  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // 4 x schema + RGBRGB x index
   main_red = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
   main_green = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
   main_blue = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
@@ -461,7 +577,7 @@ void readColors()
 
 void writeColors()
 {
-  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * 32 * (MAX_IMG_LEN + 1) + 6 * color_index; // see above ^^
+  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // see above ^^
   
   writeEEPROM(EEPROM0_ADDRESS, baseAddress++, main_red);
   writeEEPROM(EEPROM0_ADDRESS, baseAddress++, main_green);
@@ -518,23 +634,24 @@ void renderChoice(char* bottomLine)
 
 void readCurrentSchemaName(int index)
 {
-  int nameBaseAddress = index * 32 * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
+  int nameBaseAddress = index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
   for(int i = 0; i < 11; i++)
     schema_name[i] = (char)readEEPROM(EEPROM0_ADDRESS, nameBaseAddress + i);
+  schema_name[11] = '\0';
 }
 
 void readCurrentPatternPreview(int index, int lineOffset)
 {
-  int patternBaseAddress = index * 32 * (MAX_IMG_LEN + 1);
-  int patternAddress = patternBaseAddress + 32 * (1 + lineOffset); //32 (256/8) * (225 + 1 for header) + header row;
+  int patternBaseAddress = index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
+  int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + lineOffset); //32 (256/8) * (225 + 1 for header) + header row;
   for(int i = 0; i < 20; i++)
     pattern_preview_line0[i] = readPatternLineChar(patternAddress, i);
   pattern_preview_line0[20] = '\0';
-  patternAddress = patternBaseAddress + 32 * (1 + (lineOffset + 1) % MAX_IMG_LEN);
+  patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + (lineOffset + 1) % MAX_IMG_LEN);
   for(int i = 0; i < 20; i++)
     pattern_preview_line1[i] = readPatternLineChar(patternAddress, i);
   pattern_preview_line1[20] = '\0';
-  patternAddress = patternBaseAddress + 32 * (1 + (lineOffset + 2) % MAX_IMG_LEN);
+  patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + (lineOffset + 2) % MAX_IMG_LEN);
   for(int i = 0; i < 20; i++)
     pattern_preview_line2[i] = readPatternLineChar(patternAddress, i);
   pattern_preview_line2[20] = '\0';
