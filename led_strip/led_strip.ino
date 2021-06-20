@@ -179,14 +179,14 @@ void render()
       lcd.print(" Next");
       break;
     case colorSelect:
-      lcd.print("SELECT COLORS");
+      lcd.print("Select colors       ");
       lcd.setCursor(0, 1);
       lcd.print("RGB1: ");
       lcd.print("ABCDEF");
       lcd.setCursor(0, 2);
       lcd.print("RGB2: ");
       lcd.print("789ABC");
-      renderChoice("SELECT          NEXT");
+      renderChoice("Select          Next");
       break;
     case validate:
       lcd.print("PATTERN: ");
