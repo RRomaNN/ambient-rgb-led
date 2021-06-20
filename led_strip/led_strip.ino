@@ -92,6 +92,7 @@ void setup()
 
   readCurrentSchemaName(pattern_index);
   readCurrentPatternPreview(pattern_index, pattern_preview_line_offset);
+  cancelPreviewColors();
 }
 
 void loop() 
