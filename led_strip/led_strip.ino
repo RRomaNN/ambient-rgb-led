@@ -280,11 +280,9 @@ void transitState(enum buttonType button)
       switch(button)
       {
         case selectButton:
-          //go ahead
           state = pause;
           break;
         case actionButton:
-          //return back
           state = patternSelect;
           break;
       }
@@ -388,15 +386,10 @@ void render()
       renderChoice("-      Apply       +");    
       break;
     case validate:
-      lcd.print("PATTERN: ");
+      lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
-      lcd.setCursor(0, 1);
-      lcd.print("RGB1: ");
-      lcd.print("ABCDEF");
-      lcd.setCursor(0, 2);
-      lcd.print("RGB2: ");
-      lcd.print("789ABC");
-      renderChoice("APPLY         CANCEL");
+      displayColorStrings();
+      renderChoice("Apply         Cancel");
       break;
     case pause:
       lcd.print("PATTERN: ");
