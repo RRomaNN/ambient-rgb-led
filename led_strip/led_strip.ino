@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#include <Adafruit_NeoPixel.h>
 
 #define IRQ0 2
 #define IRQ1 3
@@ -11,6 +12,14 @@
 #define LCD_D6 6
 #define LCD_D7 7
 
+#define LED_PREVIEW_ARRAY_PIN 9
+#define LED_MAIN_ARRAY_PIN 10
+
+#define LED_PREVIEW_ARRAY_PIXEL_NUM 2
+#define LED_MAIN_ARRAY_PIXEL_NUM 186
+
+#define LED_ARRAY_BRIGHTNESS 240 // Not 255
+
 #define EEPROM0_ADDRESS 0x50
 #define EEPROM1_ADDRESS 0x51
 
@@ -20,6 +29,7 @@
 #define PATTERN_MAX_INDEX 3 // Pattern count - 1
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
 
 enum stateType {patternSelect, colorSelect, validate, pause, resumeBack};
 enum buttonType {selectButton, actionButton};
@@ -48,6 +58,8 @@ volatile byte secondary_green = 0x00;
 volatile byte secondary_blue = 0x00;
 volatile char secondary_color_hex[7];
 
+volatile bool color_preview = false;
+
 
 void setup() 
 {
@@ -67,6 +79,9 @@ void setup()
   
   lcd.begin(20, 4);
   lcd.clear();
+
+  preview_led_array.begin();
+  preview_led_array.setBrightness(LED_ARRAY_BRIGHTNESS);
 
   readCurrentSchemaName(pattern_index);
   readCurrentPatternPreview(pattern_index, pattern_preview_line_offset);
@@ -91,6 +106,12 @@ void loop()
 
   if(state == patternSelect)
     preview();
+
+  if(state != colorSelect && color_preview)
+  {
+    color_preview = false;
+    cancel_PreviewColors();
+  }    
 
   delay(100);
 }
@@ -191,7 +212,8 @@ void render()
       break;
     case colorSelect:
       setColorStrings();
-      lcd.print("Select colors       ");
+      previewColors();
+      lcd.print("Choose colors       ");
       lcd.setCursor(0, 1);
       lcd.print("RGB M: ");
       lcd.print((char*)main_color_hex);
@@ -237,6 +259,22 @@ void render()
       break;
   } 
 }
+
+void previewColors()
+{
+   preview_led_array.setPixelColor(0, preview_led_array.Color(main_red, main_green, main_blue));
+   preview_led_array.setPixelColor(1, preview_led_array.Color(secondary_red, secondary_green, secondary_blue));
+   preview_led_array.show();
+   color_preview = true;
+}
+
+void cancel_PreviewColors()
+{
+   preview_led_array.setPixelColor(0, preview_led_array.Color(0x00, 0x00, 0x00));
+   preview_led_array.setPixelColor(1, preview_led_array.Color(0x00, 0x00, 0x00));
+   preview_led_array.show();
+}
+
 
 void printIterationNumber()
 {
