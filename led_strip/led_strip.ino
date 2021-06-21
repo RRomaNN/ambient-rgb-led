@@ -33,6 +33,8 @@
 #define MODIFY_BUTTON_PIN A0
 #define AMPERE_METER_PIN A1
 
+#define AMPERE_METER_AVG_BUFF_SIZE 20
+
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
@@ -76,6 +78,9 @@ volatile int pattern_line_interval = 30; // todo: make ui to configure it
 volatile int pattern_count = 0;
 volatile byte current_line_data[ARRAY_PATTERN_LEN];
 volatile byte next_line_data[ARRAY_PATTERN_LEN];
+
+volatile int currents[AMPERE_METER_AVG_BUFF_SIZE];
+volatile byte currents_index = 0;
 
 void setup() 
 {
@@ -496,9 +501,7 @@ void render()
       lcd.print("Line: ");
       print3dNumber(pattern_line_offset);
       lcd.print("           ");
-      lcd.setCursor(0, 2);
-      lcd.print("Current: ");
-      lcd.print("3.5A");
+      printCurrentMeterValue();
       renderChoice("Pause            Off");
       break;
     case resumeBack:
@@ -508,12 +511,23 @@ void render()
       lcd.print("Iteration: ");
       print3dNumber(pattern_line_offset);
       lcd.print("      ");
-      lcd.setCursor(0, 2);
-      lcd.print("Current: ");
-      lcd.print("3.5A");
+      printCurrentMeterValue();
       renderChoice("Resume           Off");
       break;
   } 
+}
+
+void printCurrentMeterValue()
+{
+  lcd.setCursor(0, 2);
+  currents[currents_index] = analogRead(AMPERE_METER_PIN);
+  currents_index = currents_index == AMPERE_METER_AVG_BUFF_SIZE - 1 ? 0 : currents_index + 1;
+  int sum = 0;
+  for(int i = 0; i < AMPERE_METER_AVG_BUFF_SIZE; i++)
+    sum += currents[i];            
+  lcd.print("LED current: ");
+  lcd.print(sum * 0.0488 / AMPERE_METER_AVG_BUFF_SIZE);
+  lcd.print(" A ");
 }
 
 void printNumber(byte number)
