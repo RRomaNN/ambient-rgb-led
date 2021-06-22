@@ -25,14 +25,23 @@ namespace BitConverter
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
       port.Open();
 
-      var lines = File.ReadAllLines("C:\\triangles.txt");
+      WritePattern(port, "waves.txt");
+      WritePattern(port, "cross.txt");
+      WritePattern(port, "space.txt");
+      WritePattern(port, "triangles.txt");
+    }
+
+    private static void WritePattern(SerialPort port, string fileName)
+    {
+      var lines = File.ReadAllLines(fileName);
       foreach (var line in lines.Where(l => l.Length > 0))
       {
         port.WriteLine(line);
-        Thread.Sleep(500);
+        Thread.Sleep(1000);
       }
     }
 
+    /*
     private static void ParseImage()
     {
       Bitmap templateImage = null;
@@ -117,5 +126,7 @@ namespace BitConverter
         File.AppendAllText("C:\\x.txt", "\n");
       }
     }
+
+    */
   }
 }
