@@ -16,7 +16,8 @@
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 String command;
-volatile int writeIndex = 0;
+volatile int writeIndex = 0x0;
+volatile int schemaIndex = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -25,20 +26,25 @@ void setup() {
 
   lcd.begin(20, 4);
   lcd.clear();
-  
-  writeIndex = 0;
 }
 
 void loop() {
+
   // put your main code here, to run repeatedly:
   if (Serial.available() > 0) {
     command = Serial.readStringUntil('\n');
     lcd.setCursor(0, 0);
     lcd.print(command.substring(0, 19));
+    if(writeIndex == MAX_IMG_LEN + 1)
+    {
+      schemaIndex++;
+      writeIndex = 0;
+    }
     lcd.setCursor(0, 1);
     lcd.print(writeIndex);
-    saveSchema(3, writeIndex, command);
-    writeIndex++;
+    lcd.print(" ");
+    lcd.print(schemaIndex);
+    saveSchema(schemaIndex, writeIndex++, command);
   }
   delay(50);
 }
@@ -54,6 +60,9 @@ void saveSchema(int schemaIndex, int schemaRow, String row)
       lcd.print(" ");
       lcd.print(baseAddress + i);           
       writeEEPROM(EEPROM0_ADDRESS, baseAddress + i, (byte)row[i]);
+      byte readValue = readEEPROM(EEPROM0_ADDRESS, baseAddress + i);
+      if(readValue != (byte)row[i])
+        writeRow(3, "VALIDATION ERROR");
     }
   else
   {
