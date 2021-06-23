@@ -40,7 +40,7 @@ LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel led_array(LED_MAIN_ARRAY_PIXEL_NUM, LED_MAIN_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
 
-enum stateType {patternSelect, colorSelect, editMainRColor, editMainGColor, editMainBColor, editSecondaryRColor, editSecondaryGColor, editSecondaryBColor, validate, pause, resumeBack};
+enum stateType {patternSelect, colorSelect, editMainRColor, editMainGColor, editMainBColor, editSecondaryRColor, editSecondaryGColor, editSecondaryBColor, speedSelect, validate, pause, resumeBack};
 enum buttonType {selectButton, actionButton, modifyButton};
 
 volatile enum stateType state = patternSelect; 
@@ -74,7 +74,7 @@ volatile int color_down_momentum = 0;
 volatile byte color_index = 0;
 
 volatile byte pattern_line_offset = 0;
-volatile int pattern_line_interval = 30; // todo: make ui to configure it
+volatile byte pattern_line_interval = 30;
 volatile int pattern_count = 0;
 volatile byte current_line_data[ARRAY_PATTERN_LEN];
 volatile byte next_line_data[ARRAY_PATTERN_LEN];
@@ -140,7 +140,7 @@ void loop()
   if(state == patternSelect)
     preview();
 
-  if((state == patternSelect || state == validate || state == pause || state == resumeBack) && color_preview)
+  if((state == patternSelect || state == speedSelect || state == validate || state == pause || state == resumeBack) && color_preview)
   {
     color_preview = false;
     cancelPreviewColors();
@@ -275,7 +275,7 @@ void transitState(enum buttonType button)
           readColors();
           break;
         case actionButton:
-          state = validate;
+          state = speedSelect;
           break;
         case modifyButton:
           state = editMainRColor;
@@ -367,6 +367,17 @@ void transitState(enum buttonType button)
           break;
       }
       break;
+    case speedSelect:
+      switch(button)
+      {
+        case selectButton:
+          modifyPatternLineInterval();
+          break;
+        case actionButton:
+          state = validate;
+          break;
+      }
+      break;
     case validate:
       switch(button)
       {
@@ -406,6 +417,18 @@ void transitState(enum buttonType button)
   }
 }
 
+void modifyPatternLineInterval()
+{
+  if(pattern_line_interval > 5 && pattern_line_interval <= 30) 
+    pattern_line_interval -= 5;
+  else if(pattern_line_interval > 1 && pattern_line_interval <= 5)
+    pattern_line_interval -= 2;
+  else if(pattern_line_interval == 1)
+    pattern_line_interval = 240;
+  else
+    pattern_line_interval -= 30;
+}
+
 byte colorUp(byte color)
 {
   color_up_momentum++;
@@ -427,12 +450,7 @@ void render()
   switch(state)
   {
     case patternSelect:
-      lcd.print((char*)pattern_preview_line0);
-      lcd.setCursor(0, 1);
-      lcd.print((char*)pattern_preview_line1);
-      lcd.setCursor(0, 2);
-      lcd.print((char*)pattern_preview_line2);
-      lcd.setCursor(0, 3);
+      printPatternPreview();
       lcd.print((char*)schema_name);
       printIterationNumber();
       lcd.print(" Next");
@@ -488,18 +506,25 @@ void render()
       displayColorStrings();
       renderChoice("-      Apply       +");    
       break;
+    case speedSelect:
+      lcd.print("Set iteration count ");
+      displaySpeedStrings();
+      renderChoice("Select          Next");
+      break;
     case validate:
       lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
       displayColorStrings();
-      renderChoice("Apply         Cancel");
+      renderChoice("Apply@");
+      print3dNumberFwd(pattern_line_interval);
+      lcd.print("     Cancel");
       break;
     case pause:
       lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
       lcd.setCursor(0, 1);
       lcd.print("Line: ");
-      print3dNumber(pattern_line_offset);
+      print3dNumberFwd(pattern_line_offset);
       lcd.print("           ");
       printCurrentMeterValue();
       renderChoice("Pause            Off");
@@ -508,13 +533,32 @@ void render()
       lcd.print("Pattern: ");
       lcd.print((char*)schema_name);
       lcd.setCursor(0, 1);
-      lcd.print("Iteration: ");
-      print3dNumber(pattern_line_offset);
-      lcd.print("      ");
+      lcd.print("Iteration:       ");
+      print3dNumberFwd(pattern_line_offset);
       printCurrentMeterValue();
       renderChoice("Resume           Off");
       break;
   } 
+}
+
+void displaySpeedStrings()
+{
+  lcd.setCursor(0, 1);
+  lcd.print("Interval:        ");
+  print3dNumber(pattern_line_interval);
+  lcd.setCursor(0, 2);
+  lcd.print("                    ");
+}
+
+
+void printPatternPreview()
+{
+  lcd.print((char*)pattern_preview_line0);
+  lcd.setCursor(0, 1);
+  lcd.print((char*)pattern_preview_line1);
+  lcd.setCursor(0, 2);
+  lcd.print((char*)pattern_preview_line2);
+  lcd.setCursor(0, 3);
 }
 
 void printCurrentMeterValue()
@@ -538,6 +582,15 @@ void printNumber(byte number)
 }
 
 void print3dNumber(byte number)
+{
+  if(number < 10)
+    lcd.print(" ");
+  if(number < 100)
+    lcd.print(" ");
+  lcd.print(number);
+}
+
+void print3dNumberFwd(byte number)
 {
   lcd.print(number);
   if(number < 10)
