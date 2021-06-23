@@ -26,8 +26,8 @@
 #define MAX_IMG_LEN 225
 #define ARRAY_PATTERN_LEN 32
 
-#define PATTERN_MAX_COUNT_EEPROM0 4
-#define PATTERN_MAX_INDEX 3 // Pattern count - 1
+#define PATTERN_MAX_COUNT_PER_EEPROM 4
+#define PATTERN_MAX_INDEX 7 // Pattern count - 1
 #define MAX_PREDEFINED_COLORS 32
 
 #define MODIFY_BUTTON_PIN A0
@@ -164,17 +164,18 @@ void renderLedArray()
     //update pattern
     pattern_line_offset = pattern_line_offset == MAX_IMG_LEN - 1 ? 0 : pattern_line_offset + 1;
 
-    int patternBaseAddress = pattern_index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
+    byte eeprom_address = pattern_index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+    int patternBaseAddress = (pattern_index % 4) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
     
     int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + pattern_line_offset); //32 (256/8) * (225 + 1 for header) + header row;
     for(int i = 0; i < ARRAY_PATTERN_LEN; i++)
-      current_line_data[i] = readEEPROM(EEPROM0_ADDRESS, patternAddress + i);
+      current_line_data[i] = readEEPROM(eeprom_address, patternAddress + i);
       
     int nextPatternOffset = pattern_line_offset == MAX_IMG_LEN - 1 ? 0 : pattern_line_offset + 1;
     
     patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + nextPatternOffset);
     for(int i = 0; i < ARRAY_PATTERN_LEN; i++)
-      next_line_data[i] = readEEPROM(EEPROM0_ADDRESS, patternAddress + i);
+      next_line_data[i] = readEEPROM(eeprom_address, patternAddress + i);
   }
   else
     pattern_count++;
@@ -633,7 +634,7 @@ void turnOffLedArray()
 
 void readColors()
 {
-  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // 4 x schema + RGBRGB x index
+  int baseAddress = PATTERN_MAX_COUNT_PER_EEPROM * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // 4 x schema + RGBRGB x index
   main_red = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
   main_green = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
   main_blue = readEEPROM(EEPROM0_ADDRESS, baseAddress++);
@@ -644,7 +645,7 @@ void readColors()
 
 void writeColors()
 {
-  int baseAddress = PATTERN_MAX_COUNT_EEPROM0 * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // see above ^^
+  int baseAddress = PATTERN_MAX_COUNT_PER_EEPROM * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // see above ^^
   
   writeEEPROM(EEPROM0_ADDRESS, baseAddress++, main_red);
   writeEEPROM(EEPROM0_ADDRESS, baseAddress++, main_green);
@@ -701,32 +702,34 @@ void renderChoice(char* bottomLine)
 
 void readCurrentSchemaName(int index)
 {
-  int nameBaseAddress = index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
+  byte eeprom_address = index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+  int nameBaseAddress = (index % PATTERN_MAX_COUNT_PER_EEPROM) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
   for(int i = 0; i < 11; i++)
-    schema_name[i] = (char)readEEPROM(EEPROM0_ADDRESS, nameBaseAddress + i);
+    schema_name[i] = (char)readEEPROM(eeprom_address, nameBaseAddress + i);
   schema_name[11] = '\0';
 }
 
 void readCurrentPatternPreview(int index, int lineOffset)
 {
-  int patternBaseAddress = index * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
+  byte eeprom_address = index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+  int patternBaseAddress = (index % PATTERN_MAX_COUNT_PER_EEPROM) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
   int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + lineOffset); //32 (256/8) * (225 + 1 for header) + header row;
   for(int i = 0; i < 20; i++)
-    pattern_preview_line0[i] = readPatternLineChar(patternAddress, i);
+    pattern_preview_line0[i] = readPatternLineChar(eeprom_address, patternAddress, i);
   pattern_preview_line0[20] = '\0';
   patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + (lineOffset + 1) % MAX_IMG_LEN);
   for(int i = 0; i < 20; i++)
-    pattern_preview_line1[i] = readPatternLineChar(patternAddress, i);
+    pattern_preview_line1[i] = readPatternLineChar(eeprom_address, patternAddress, i);
   pattern_preview_line1[20] = '\0';
   patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + (lineOffset + 2) % MAX_IMG_LEN);
   for(int i = 0; i < 20; i++)
-    pattern_preview_line2[i] = readPatternLineChar(patternAddress, i);
+    pattern_preview_line2[i] = readPatternLineChar(eeprom_address, patternAddress, i);
   pattern_preview_line2[20] = '\0';
 }
 
-byte readPatternLineChar(int patternBaseAddress, int bitIndex)
+byte readPatternLineChar(byte eeprom_address, int patternBaseAddress, int bitIndex)
 {
-  return (readEEPROM(EEPROM0_ADDRESS, (patternBaseAddress + bitIndex/8)) & (1 << bitIndex % 8)) ? char(255) : ' ';
+  return (readEEPROM(eeprom_address, (patternBaseAddress + bitIndex/8)) & (1 << bitIndex % 8)) ? char(255) : ' ';
 }
 
 byte readEEPROM(int deviceaddress, unsigned int eeaddress) 
