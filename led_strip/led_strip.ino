@@ -164,7 +164,7 @@ void renderLedArray()
     //update pattern
     pattern_line_offset = pattern_line_offset == MAX_IMG_LEN - 1 ? 0 : pattern_line_offset + 1;
 
-    byte eeprom_address = pattern_index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+    byte eeprom_address = pattern_index >= PATTERN_MAX_COUNT_PER_EEPROM ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
     int patternBaseAddress = (pattern_index % 4) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
     
     int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + pattern_line_offset); //32 (256/8) * (225 + 1 for header) + header row;
@@ -702,7 +702,7 @@ void renderChoice(char* bottomLine)
 
 void readCurrentSchemaName(int index)
 {
-  byte eeprom_address = index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+  byte eeprom_address = index >= PATTERN_MAX_COUNT_PER_EEPROM ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
   int nameBaseAddress = (index % PATTERN_MAX_COUNT_PER_EEPROM) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
   for(int i = 0; i < 11; i++)
     schema_name[i] = (char)readEEPROM(eeprom_address, nameBaseAddress + i);
@@ -711,7 +711,7 @@ void readCurrentSchemaName(int index)
 
 void readCurrentPatternPreview(int index, int lineOffset)
 {
-  byte eeprom_address = index > 3 ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
+  byte eeprom_address = index >= PATTERN_MAX_COUNT_PER_EEPROM ? EEPROM1_ADDRESS : EEPROM0_ADDRESS;
   int patternBaseAddress = (index % PATTERN_MAX_COUNT_PER_EEPROM) * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1);
   int patternAddress = patternBaseAddress + ARRAY_PATTERN_LEN * (1 + lineOffset); //32 (256/8) * (225 + 1 for header) + header row;
   for(int i = 0; i < 20; i++)
