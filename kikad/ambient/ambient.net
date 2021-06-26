@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source D:\Projects\ambient-rgb-led\kikad\ambient\ambient.sch)
-    (date "26.06.2021 4:25:37")
+    (date "26.06.2021 17:42:48")
     (tool "Eeschema (5.1.10)-1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -395,7 +395,7 @@
       (tstamp 60F09CA8))
     (comp (ref Q1)
       (value 2N3904)
-      (footprint Package_TO_SOT_THT:TO-92_Inline)
+      (footprint Package_TO_SOT_THT:TO-92)
       (datasheet https://www.onsemi.com/pub/Collateral/2N3903-D.PDF)
       (libsource (lib Transistor_BJT) (part 2N3904) (description "0.2A Ic, 40V Vce, Small Signal NPN Transistor, TO-92"))
       (sheetpath (names /) (tstamps /))
