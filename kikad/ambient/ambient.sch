@@ -166,7 +166,7 @@ U 1 1 60D65E29
 P 950 5550
 F 0 "Y1" H 850 5450 50  0000 C CNN
 F 1 "16 MHz" H 950 5350 50  0000 C CNN
-F 2 "Crystal:Crystal_HC18-U_Vertical" H 950 5550 50  0001 C CNN
+F 2 "Crystal:Crystal_HC49-4H_Vertical" H 950 5550 50  0001 C CNN
 F 3 "~" H 950 5550 50  0001 C CNN
 	1    950  5550
 	1    0    0    -1  
