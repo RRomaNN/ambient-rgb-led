@@ -20,18 +20,19 @@ Features:
 
 Schema:
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/readme/schema.png?raw=true)
+![alt text](https://github.com/RRomaNN/ambient-rgb-led/blob/main/readme/schema.png?raw=true)
 
 PCB front view:
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/readme/pcb_front.png?raw=true)
+![alt text](https://github.com/RRomaNN/ambient-rgb-led/blob/main/readme/pcb_front.png?raw=true)
 
 PCB back view:
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/readme/pcb_back.png?raw=true)
+![alt text](https://github.com/RRomaNN/ambient-rgb-led/blob/main/readme/pcb_back.png?raw=true)
 
 Firmware:
 
-[controller.ino](https://github.com/[username]/[reponame]/blob/[branch]/controller/controller.ino)
+[controller.ino](https://github.com/RRomaNN/ambient-rgb-led/blob/main/controller/controller.ino)
+
 
 
