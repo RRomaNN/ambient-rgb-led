@@ -1,6 +1,6 @@
-# Ambient backlight with addressable RGB strip
+# Ambient backlight with addressable RGB strip [WIP]
 
-This is a prototype of the LED backlight controller.
+This is a **prototype** of the LED backlight controller.
 
 in short:
 
