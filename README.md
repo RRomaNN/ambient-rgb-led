@@ -32,7 +32,7 @@ PCB back view:
 
 Firmware:
 
-[controller.ino](https://github.com/RRomaNN/ambient-rgb-led/blob/main/controller/controller.ino)
+[controller.ino](https://github.com/RRomaNN/ambient-rgb-led/blob/main/controller_c/controller.ino)
 
 
 
