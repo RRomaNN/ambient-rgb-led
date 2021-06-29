@@ -11,7 +11,7 @@ Features:
 - Supports up to 16 patterns, stored in 4x AT24C256 EEPROMs. You can interactively select one of them at a time.
 - Supports up to 32 custom color schemas. You can create/edit/save them to EEPROM directly on the device using buttons, LCD and the short *preview* led strip.
 - Supports different pattern playback speeds. From ~3 smooth transitions/second to 1 transition per 2 minutes. You can select the one you need.
-- Measures amperage of the LED strip and displays it on the LED in the operating mode. 
+- Measures amperage of the LED strip and displays it on the LCD in the operating mode. 
 - TODO: Add feature, which allows limiting max current draw by LED strip to prevent damage of DC power supply / PCB.
 
 - Load current - up to 10A.
