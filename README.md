@@ -8,7 +8,7 @@ you can upload an image/pattern from the computer to the device. The image repre
 
 Features:
 
-- Supports up to 16 patterns, stored in 4x AT24C256 EEPROMs. You can select an of them.
+- Supports up to 16 patterns, stored in 4x AT24C256 EEPROMs. You can select any of them.
 - Supports up to 32 custom color schemas. You can create/edit/save them to EEPROM directly on the device using buttons, LCD and short *preview* led strip.
 - Supports different pattern playback speeds. From ~3 smooth transitions/second to 1 transition per 2 minutes. You can select the one you need.
 - Measures amperage of the LED strip and displays it on the LED in the operating mode. 
