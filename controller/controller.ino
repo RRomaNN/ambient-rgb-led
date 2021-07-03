@@ -34,6 +34,7 @@
 
 #define AMPERE_METER_AVG_BUFF_SIZE 20
 #define ADC_VOLT_TO_AMP_COEF .0488
+#define MAX_LED_ARRAY_CURRENT 8.0
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
@@ -82,8 +83,10 @@ volatile byte next_line_data[ARRAY_PATTERN_LEN];
 volatile int currents[AMPERE_METER_AVG_BUFF_SIZE];
 volatile byte currents_index = 0;
 
+volatile byte ledArrayBrightness;
+
 void setup() 
-{
+{  
   pinMode(LED_BUILTIN, OUTPUT);
   
   cli();
@@ -104,8 +107,9 @@ void setup()
   preview_led_array.begin();
   preview_led_array.setBrightness(LED_ARRAY_BRIGHTNESS);
 
+  ledArrayBrightness = LED_ARRAY_BRIGHTNESS;
   led_array.begin();
-  led_array.setBrightness(LED_ARRAY_BRIGHTNESS);
+  led_array.setBrightness(ledArrayBrightness);
 
   readCurrentSchemaName(pattern_index);
   readCurrentPatternPreview(pattern_index, pattern_preview_line_offset);
@@ -564,15 +568,32 @@ void printPatternPreview()
 
 void printCurrentMeterValue()
 {
-  lcd.setCursor(0, 2);
   currents[currents_index] = analogRead(AMPERE_METER_PIN);
   currents_index = currents_index == AMPERE_METER_AVG_BUFF_SIZE - 1 ? 0 : currents_index + 1;
   int sum = 0;
   for(int i = 0; i < AMPERE_METER_AVG_BUFF_SIZE; i++)
-    sum += currents[i];            
+    sum += currents[i];          
+  float current = sum * ADC_VOLT_TO_AMP_COEF / AMPERE_METER_AVG_BUFF_SIZE;  
+  lcd.setCursor(0, 2);
   lcd.print("LED current: ");
-  lcd.print(sum * ADC_VOLT_TO_AMP_COEF / AMPERE_METER_AVG_BUFF_SIZE);
-  lcd.print(" A ");
+  if(ledArrayBrightness)
+  {
+    lcd.print(current);
+    lcd.print(" A ");
+  }
+  else
+    lcd.print("HIGH!!!");    
+
+  checkCurrent(current);
+}
+
+void checkCurrent(float current)
+{
+  if(current > MAX_LED_ARRAY_CURRENT && ledArrayBrightness > 0)
+  {
+    ledArrayBrightness = 0;
+    led_array.setBrightness(ledArrayBrightness);
+  }
 }
 
 void printNumber(byte number)
