@@ -19,14 +19,16 @@ namespace BitConverter
     {
       //DrawSlider("slider.txt", "Slider             \n");
       //ParsePattern("labyrinth.bmp", "labyrinth.txt", "Labyrinth          \n");
-      ParseImage("multicolor.bmp", "2_img.txt", "3_img.txt");
-      return;
+      //ParseImage("multicolor.bmp", "2_img.txt", "3_img.txt");
+      //return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
       port.Open();
 
-      for (var i = 0; i < _fileNames[EepromIndex].Length; i++)
-        WritePattern(port, _fileNames[EepromIndex][i]);
+      //for (var i = 0; i < _fileNames[EepromIndex].Length; i++)
+      //  WritePattern(port, _fileNames[EepromIndex][i]);
+
+      WriteImage(port, "2_img.txt");
     }
 
     private static void WritePattern(SerialPort port, string fileName)
@@ -36,6 +38,18 @@ namespace BitConverter
       {
         port.WriteLine(line);
         Thread.Sleep(1000);
+      }
+    }
+
+    private static void WriteImage(SerialPort port, string fileName)
+    {
+      var lines = File.ReadAllLines(fileName);
+      foreach (var line in lines.Where(l => l.Length > 0))
+      {
+        var triples = line.Split("*", System.StringSplitOptions.RemoveEmptyEntries);
+        foreach (var triple in triples)
+          port.WriteLine(triple);
+        Thread.Sleep(300);
       }
     }
 
@@ -69,7 +83,7 @@ namespace BitConverter
           for (var j = 0; j < image.Width; j++)
           {
             var pixel = image.GetPixel(j, i);
-            File.AppendAllText(filename, $"{pixel.R}|{pixel.G}|{pixel.B}|");
+            File.AppendAllText(filename, $"{pixel.R}|{pixel.G}|{pixel.B}*");
           }
           File.AppendAllText(filename, "\n");
         }
