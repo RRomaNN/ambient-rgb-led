@@ -11,15 +11,10 @@ namespace BitConverter
   {
     static void Main(string[] args)
     {
-      Console.WriteLine("Hello World!");
-
-      //DrawX();
-      //return;
+      ParseImage("circles.bmp", "circles.txt", "Circles            \n");
+      return;
 
       //ParseImageSpace();
-      //return;
-
-      //ParseImageTriangle();
       //return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
@@ -41,76 +36,28 @@ namespace BitConverter
       }
     }
 
+    private static void ParseImage(string inFile, string outFile, string name)
+    {
+      using (var image = new Bitmap(inFile))
+      {
+        File.AppendAllText(outFile, name);
+        for (var i = 0; i < image.Width; i++)
+        {
+          for (var j = 0; j < image.Height; j++)
+          {
+            var pixel = image.GetPixel(i, j);
+            if (pixel.R > 240 && pixel.G > 240 && pixel.B > 240)
+              File.AppendAllText(outFile, "1");
+            else
+              File.AppendAllText(outFile, "0");
+          }
+          File.AppendAllText(outFile, "\n");
+        }
+      }
+    }
+    
     /*
-    private static void ParseImage()
-    {
-      Bitmap templateImage = null;
-      using (var image = new Bitmap(@"C:\\Sketch002.bmp"))
-      {
-        templateImage = new Bitmap(image);
-
-        File.AppendAllText("C:\\waves.txt", "Waves              \n");
-        for (var i = 0; i < templateImage.Width; i++)
-        {
-          for (var j = 0; j < templateImage.Height; j++)
-          {
-            var pixel = templateImage.GetPixel(i, j);
-            if (pixel.R > 240 && pixel.G > 240 && pixel.B > 240)
-              File.AppendAllText("C:\\waves.txt", "1");
-            else
-              File.AppendAllText("C:\\waves.txt", "0");
-          }
-          File.AppendAllText("C:\\waves.txt", "\n");
-        }
-      }
-    }
-
-    private static void ParseImageSpace()
-    {
-      Bitmap templateImage = null;
-      using (var image = new Bitmap(@"C:\\deep_sky.bmp"))
-      {
-        templateImage = new Bitmap(image);
-
-        File.AppendAllText("C:\\space.txt", "Space              \n");
-        for (var i = 0; i < templateImage.Width; i++)
-        {
-          for (var j = 0; j < templateImage.Height; j++)
-          {
-            var pixel = templateImage.GetPixel(i, j);
-            if (pixel.R > 240 && pixel.G > 240 && pixel.B > 240)
-              File.AppendAllText("C:\\space.txt", "1");
-            else
-              File.AppendAllText("C:\\space.txt", "0");
-          }
-          File.AppendAllText("C:\\space.txt", "\n");
-        }
-      }
-    }
-
-    private static void ParseImageTriangle()
-    {
-      Bitmap templateImage = null;
-      using (var image = new Bitmap(@"C:\\triangles.bmp"))
-      {
-        templateImage = new Bitmap(image);
-
-        File.AppendAllText("C:\\triangles.txt", "Triangles          \n");
-        for (var i = 0; i < templateImage.Width; i++)
-        {
-          for (var j = 0; j < templateImage.Height; j++)
-          {
-            var pixel = templateImage.GetPixel(i, j);
-            if (pixel.R > 240 && pixel.G > 240 && pixel.B > 240)
-              File.AppendAllText("C:\\triangles.txt", "1");
-            else
-              File.AppendAllText("C:\\triangles.txt", "0");
-          }
-          File.AppendAllText("C:\\triangles.txt", "\n");
-        }
-      }
-    }
-
+     * 
     private static void DrawX()
     {
       File.AppendAllText("C:\\x.txt", "Cross              \n");
