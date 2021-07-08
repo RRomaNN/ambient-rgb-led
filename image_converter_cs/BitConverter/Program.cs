@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -9,19 +8,24 @@ namespace BitConverter
 {
   class Program
   {
+    private static string[][] _fileNames = {
+      new [] { "0_0_waves.txt", "0_1_cross.txt", "0_2_space.txt", "0_3_triangles.txt" },
+      new [] { "1_0_bubbles.txt", "1_1_slider.txt", "1_2_circles.txt" }
+    };
+
+    private const int EepromIndex = 1;
+
     static void Main(string[] args)
     {
-      DrawSlider("slider.txt", "Slider             \n");
-      //ParseImage("circles.bmp", "circles.txt", "Circles            \n");
+      //DrawSlider("slider.txt", "Slider             \n");
+      ParseImage("rounds.bmp", "circles.txt", "Rounds             \n");
       return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
       port.Open();
 
-      WritePattern(port, "waves.txt");
-      WritePattern(port, "cross.txt");
-      WritePattern(port, "space.txt");
-      WritePattern(port, "triangles.txt");
+      for (var i = 0; i < _fileNames[EepromIndex].Length; i++)
+        WritePattern(port, _fileNames[EepromIndex][i]);
     }
 
     private static void WritePattern(SerialPort port, string fileName)
@@ -34,7 +38,7 @@ namespace BitConverter
       }
     }
 
-    /*private static void ParseImage(string inFile, string outFile, string name)
+    private static void ParseImage(string inFile, string outFile, string name)
     {
       using (var image = new Bitmap(inFile))
       {
@@ -44,7 +48,7 @@ namespace BitConverter
           for (var j = 0; j < image.Height; j++)
           {
             var pixel = image.GetPixel(i, j);
-            if (pixel.R > 240 && pixel.G > 240 && pixel.B > 240)
+            if (pixel.R > 127 && pixel.G > 127 && pixel.B > 127)
               File.AppendAllText(outFile, "1");
             else
               File.AppendAllText(outFile, "0");
@@ -52,7 +56,7 @@ namespace BitConverter
           File.AppendAllText(outFile, "\n");
         }
       }
-    }*/
+    }
 
     private static void DrawX(string outFile, string name)
     {
