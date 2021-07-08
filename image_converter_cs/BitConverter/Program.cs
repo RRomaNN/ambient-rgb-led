@@ -11,11 +11,9 @@ namespace BitConverter
   {
     static void Main(string[] args)
     {
-      ParseImage("circles.bmp", "circles.txt", "Circles            \n");
+      DrawSlider("slider.txt", "Slider             \n");
+      //ParseImage("circles.bmp", "circles.txt", "Circles            \n");
       return;
-
-      //ParseImageSpace();
-      //return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
       port.Open();
@@ -36,7 +34,7 @@ namespace BitConverter
       }
     }
 
-    private static void ParseImage(string inFile, string outFile, string name)
+    /*private static void ParseImage(string inFile, string outFile, string name)
     {
       using (var image = new Bitmap(inFile))
       {
@@ -54,26 +52,48 @@ namespace BitConverter
           File.AppendAllText(outFile, "\n");
         }
       }
-    }
-    
-    /*
-     * 
-    private static void DrawX()
+    }*/
+
+    private static void DrawX(string outFile, string name)
     {
-      File.AppendAllText("C:\\x.txt", "Cross              \n");
+      File.AppendAllText(outFile, name);
       for (var i = 0; i < 225; i++)
       {
         for (var j = 0; j < 225; j++)
         {
           if (j < 113 && i > j && i < 225 - j || j > 112 && i < j && i > 225 - j)
-            File.AppendAllText("C:\\x.txt", "1");
+            File.AppendAllText(outFile, "1");
           else
-            File.AppendAllText("C:\\x.txt", "0");
+            File.AppendAllText(outFile, "0");
         }
-        File.AppendAllText("C:\\x.txt", "\n");
+        File.AppendAllText(outFile, "\n");
       }
     }
 
-    */
+    private static void DrawSlider(string outFile, string name)
+    {
+      File.AppendAllText(outFile, name);
+      for (var i = 0; i < 225; i++)
+      {
+        for (var j = 0; j < 225; j++)
+        {
+          if (i < 113)
+          {
+            if (j > 2 * i)
+              File.AppendAllText(outFile, "1");
+            else
+              File.AppendAllText(outFile, "0");
+          }
+          else
+          {
+            if (j > 2 * (i - 113))
+              File.AppendAllText(outFile, "0");
+            else
+              File.AppendAllText(outFile, "1");
+          }
+        }
+        File.AppendAllText(outFile, "\n");
+      }
+    }
   }
 }
