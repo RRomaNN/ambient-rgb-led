@@ -18,7 +18,8 @@ namespace BitConverter
     static void Main(string[] args)
     {
       //DrawSlider("slider.txt", "Slider             \n");
-      ParseImage("labyrinth.bmp", "labyrinth.txt", "Labyrinth          \n");
+      //ParsePattern("labyrinth.bmp", "labyrinth.txt", "Labyrinth          \n");
+      ParseImage("multicolor.bmp", "2_img.txt", "3_img.txt");
       return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
@@ -38,7 +39,7 @@ namespace BitConverter
       }
     }
 
-    private static void ParseImage(string inFile, string outFile, string name)
+    private static void ParsePattern(string inFile, string outFile, string name)
     {
       using (var image = new Bitmap(inFile))
       {
@@ -54,6 +55,23 @@ namespace BitConverter
               File.AppendAllText(outFile, "0");
           }
           File.AppendAllText(outFile, "\n");
+        }
+      }
+    }
+
+    private static void ParseImage(string inFile, string outFile0, string outFile1)
+    {
+      using (var image = new Bitmap(inFile))
+      {
+        for (var i = 0; i < image.Height; i++)
+        {
+          var filename = i < 48 ? outFile0 : outFile1;
+          for (var j = 0; j < image.Width; j++)
+          {
+            var pixel = image.GetPixel(j, i);
+            File.AppendAllText(filename, $"{pixel.R}|{pixel.G}|{pixel.B}|");
+          }
+          File.AppendAllText(filename, "\n");
         }
       }
     }
