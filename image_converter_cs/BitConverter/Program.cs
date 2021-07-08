@@ -10,7 +10,7 @@ namespace BitConverter
   {
     private static string[][] _fileNames = {
       new [] { "0_0_waves.txt", "0_1_cross.txt", "0_2_space.txt", "0_3_triangles.txt" },
-      new [] { "1_0_bubbles.txt", "1_1_slider.txt", "1_2_circles.txt" }
+      new [] { "1_0_bubbles.txt", "1_1_slider.txt", "1_2_circles.txt", "1_3_labyrinth.txt" }
     };
 
     private const int EepromIndex = 1;
@@ -18,7 +18,7 @@ namespace BitConverter
     static void Main(string[] args)
     {
       //DrawSlider("slider.txt", "Slider             \n");
-      ParseImage("rounds.bmp", "circles.txt", "Rounds             \n");
+      ParseImage("labyrinth.bmp", "labyrinth.txt", "Labyrinth          \n");
       return;
 
       var port = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
