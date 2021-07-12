@@ -18,7 +18,7 @@
 #define LED_PREVIEW_ARRAY_PIXEL_NUM 2
 #define LED_MAIN_ARRAY_PIXEL_NUM 186
 
-#define LED_ARRAY_BRIGHTNESS 240 // Not 255
+#define LED_ARRAY_BRIGHTNESS 255 // Not 255
 
 #define EEPROM_BASE_ADDRESS 0x50
 
@@ -26,14 +26,14 @@
 #define ARRAY_PATTERN_LEN 32
 
 #define PATTERN_MAX_COUNT_PER_EEPROM 4
-#define PATTERN_MAX_INDEX 15 // Pattern count - 1
+#define PATTERN_MAX_INDEX 3 // Pattern count - 1
 #define MAX_PREDEFINED_COLORS 32
 
 #define MODIFY_BUTTON_PIN A0
 #define AMPERE_METER_PIN A1
 
 #define AMPERE_METER_AVG_BUFF_SIZE 20
-#define ADC_VOLT_TO_AMP_COEF .0488
+#define ADC_VOLT_TO_AMP_COEF .0978
 #define MAX_LED_ARRAY_CURRENT 8.0
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
@@ -116,6 +116,18 @@ void setup()
   
   cancelPreviewColors();
   turnOffLedArray();
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() 
@@ -155,6 +167,8 @@ void loop()
     digitalWrite(LED_BUILTIN, HIGH);
     renderLedArray();
   }
+  else
+    digitalWrite(LED_BUILTIN, LOW);
 
   delay(100);
 }
