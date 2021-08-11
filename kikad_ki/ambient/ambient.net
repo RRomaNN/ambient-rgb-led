@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source D:\Projects\ambient-rgb-led\kikad_ki\ambient\ambient.sch)
-    (date "09.07.2021 18:34:53")
+    (date "11.08.2021 20:31:31")
     (tool "Eeschema (5.1.10)-1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
