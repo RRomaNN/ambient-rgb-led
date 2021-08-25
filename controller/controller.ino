@@ -38,8 +38,8 @@
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
-Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led_array(LED_MAIN_ARRAY_PIXEL_NUM, LED_MAIN_ARRAY_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel preview_led_array(LED_PREVIEW_ARRAY_PIXEL_NUM, LED_PREVIEW_ARRAY_PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel led_array(LED_MAIN_ARRAY_PIXEL_NUM, LED_MAIN_ARRAY_PIN, NEO_GRBW + NEO_KHZ800);
 
 enum stateType {patternSelect, colorSelect, editMainRColor, editMainGColor, editMainBColor, editSecondaryRColor, editSecondaryGColor, editSecondaryBColor, speedSelect, validate, pause, resumeBack};
 enum buttonType {selectButton, actionButton, modifyButton};
@@ -88,6 +88,8 @@ volatile byte ledArrayBrightness;
 void setup() 
 {  
   pinMode(LED_BUILTIN, OUTPUT);
+
+  hello();
   
   cli();
  
@@ -116,6 +118,21 @@ void setup()
   
   cancelPreviewColors();
   turnOffLedArray();
+}
+
+void hello()
+{
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() 
@@ -197,19 +214,21 @@ void setLedArrayColors()
     bool currentValue = current_line_data[i / 8] & (1 << i % 8);
     bool nextValue = next_line_data[i / 8] & (1 << i % 8);
 
+    byte red, green, blue, white;
     if(currentValue && nextValue)
     {
-      led_array.setPixelColor(i, led_array.Color(main_red, main_green, main_blue));  
+      white = getWhite(main_red, main_green, main_blue);
+      led_array.setPixelColor(i, led_array.Color(main_red - white, main_green - white, main_blue - white, white));  
       continue;
     }
 
     if(!currentValue && !nextValue)
     {
-      led_array.setPixelColor(i, led_array.Color(secondary_red, secondary_green, secondary_blue));  
+      white = getWhite(secondary_red, secondary_green, secondary_blue);
+      led_array.setPixelColor(i, led_array.Color(secondary_red - white, secondary_green - white, secondary_blue - white, white));  
       continue;
     }
 
-    byte red, green, blue;
     if(currentValue && !nextValue)
     {
       red = main_red * oldFraction + secondary_red * newFraction;
@@ -222,10 +241,18 @@ void setLedArrayColors()
       green = main_green * newFraction + secondary_green * oldFraction;
       blue = main_blue * newFraction + secondary_blue * oldFraction; 
     }
-    led_array.setPixelColor(i, led_array.Color(red, green, blue)); 
+    white = getWhite(red, green, blue);
+    led_array.setPixelColor(i, led_array.Color(red - white, green - white, blue - white, white)); 
   }
   led_array.show();
 }
+
+byte getWhite(byte red, byte green, byte blue)
+{
+  byte rb = red < green ? red : green;
+  return rb < blue ? rb : blue;
+}
+
 
 void processModifyButton()
 {
@@ -633,23 +660,25 @@ void displayColorStrings()
 
 void previewColors()
 {
-  preview_led_array.setPixelColor(0, preview_led_array.Color(main_red, main_green, main_blue));
-  preview_led_array.setPixelColor(1, preview_led_array.Color(secondary_red, secondary_green, secondary_blue));
+  byte white = getWhite(main_red, main_green, main_blue);
+  preview_led_array.setPixelColor(0, preview_led_array.Color(main_red - white, main_green - white, main_blue - white, white));
+  white = getWhite(secondary_red, secondary_green, secondary_blue);
+  preview_led_array.setPixelColor(1, preview_led_array.Color(secondary_red - white, secondary_green - white, secondary_blue - white, white));
   preview_led_array.show();
   color_preview = true;
 }
 
 void cancelPreviewColors()
 {
-  preview_led_array.setPixelColor(0, preview_led_array.Color(0x00, 0x00, 0x00));
-  preview_led_array.setPixelColor(1, preview_led_array.Color(0x00, 0x00, 0x00));
+  preview_led_array.setPixelColor(0, preview_led_array.Color(0x00, 0x00, 0x00, 0x00));
+  preview_led_array.setPixelColor(1, preview_led_array.Color(0x00, 0x00, 0x00, 0x00));
   preview_led_array.show();
 }
 
 void turnOffLedArray()
 {
   for(byte i = 0; i < LED_MAIN_ARRAY_PIXEL_NUM; i++)
-    led_array.setPixelColor(i, led_array.Color(0x00, 0x00, 0x00));
+    led_array.setPixelColor(i, led_array.Color(0x00, 0x00, 0x00, 0x00));
   led_array.show();
 }
 
