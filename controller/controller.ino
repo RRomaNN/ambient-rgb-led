@@ -33,7 +33,7 @@
 #define AMPERE_METER_PIN A1
 
 #define AMPERE_METER_AVG_BUFF_SIZE 20
-#define ADC_VOLT_TO_AMP_COEF .0488
+#define ADC_VOLT_TO_AMP_COEF 0.2443
 #define MAX_LED_ARRAY_CURRENT 8.0
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
@@ -118,6 +118,9 @@ void setup()
   
   cancelPreviewColors();
   turnOffLedArray();
+
+  readCurrentState();
+  state = pause;
 }
 
 void hello()
@@ -202,6 +205,7 @@ void renderLedArray()
     pattern_count++;
 
   setLedArrayColors();
+  saveCurrentState();
 }
 
 void setLedArrayColors()
@@ -431,6 +435,7 @@ void transitState(enum buttonType button)
           break;
         case actionButton:
           turnOffLedArray();
+          digitalWrite(LED_BUILTIN, LOW);
           state = patternSelect;
           break;
       }
@@ -709,6 +714,30 @@ void writeColors()
 int getColorSetBaseAddress()
 {
   return PATTERN_MAX_COUNT_PER_EEPROM * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * color_index; // 4 x schema + RGBRGB x index
+}
+
+void readCurrentState()
+{
+  int baseAddress = getMemoBaseAddress();
+
+  pattern_index = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
+  color_index = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
+  readColors();
+  pattern_line_interval = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
+}
+
+void saveCurrentState()
+{
+  int baseAddress = getMemoBaseAddress();
+
+  writeEEPROM(EEPROM_BASE_ADDRESS, baseAddress++, pattern_index);
+  writeEEPROM(EEPROM_BASE_ADDRESS, baseAddress++, color_index);
+  writeEEPROM(EEPROM_BASE_ADDRESS, baseAddress++, pattern_line_interval);
+}
+
+int getMemoBaseAddress()
+{
+  return PATTERN_MAX_COUNT_PER_EEPROM * ARRAY_PATTERN_LEN * (MAX_IMG_LEN + 1) + 6 * MAX_PREDEFINED_COLORS; // 4 x schema + RGBRGB x color set count
 }
 
 void printIterationNumber()
