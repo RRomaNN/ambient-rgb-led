@@ -723,7 +723,7 @@ void readCurrentState()
   pattern_index = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
   color_index = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
   readColors();
-  pattern_line_interval = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
+  pattern_count = pattern_line_interval = readEEPROM(EEPROM_BASE_ADDRESS, baseAddress++);
 }
 
 void saveCurrentState()
