@@ -1,6 +1,7 @@
-#include <stdint.h>
 #ifndef __EEPROM__
 #define __EEPROM__
+
+#include "global.hpp"
 
 static const uint8_t EepromAddress = 0x50;
 static const uint8_t RwBlockSize  =  0x10;
@@ -18,8 +19,6 @@ static const uint16_t Selected2ColorAddress  = 0x6241;
 static const uint16_t Selected4ColorAddress  = 0x6242;
 static const uint16_t SelectedSpeedAddress   = 0x6243; //uint16_t
 static const uint16_t SelectedLedCount       = 0x6245; 
-
-#include "global.hpp"
 
 class Eeprom
 {

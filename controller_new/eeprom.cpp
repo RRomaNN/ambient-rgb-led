@@ -18,7 +18,7 @@ byte Eeprom::ReadByte(int address)
   Wire.write((int)(address >> 8));
   Wire.write((int)(address & 0xFF));
   Wire.endTransmission();                  
-  Wire.requestFrom(EepromAddress, 0x01);
+  Wire.requestFrom((int)EepromAddress, (int)0x01);
   while (!Wire.available()) 
     delayMicroseconds(IdleTimeUs);
   return Wire.read();
@@ -63,7 +63,7 @@ void Eeprom::ReadData(int address, int size, byte* data)
     Wire.endTransmission();   
     if (i < block_count - 1 || !isLastBlockPartial)
     {
-      Wire.requestFrom(EepromAddress, RwBlockSize);
+      Wire.requestFrom((int)EepromAddress, (int)RwBlockSize);
       while (!Wire.available()) 
         delayMicroseconds(IdleTimeUs);
 
@@ -72,7 +72,7 @@ void Eeprom::ReadData(int address, int size, byte* data)
     }
     else
     {
-      Wire.requestFrom(EepromAddress, lastBlockBytes);
+      Wire.requestFrom((int)EepromAddress, (int)lastBlockBytes);
       while (!Wire.available()) 
         delayMicroseconds(IdleTimeUs);
 

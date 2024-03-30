@@ -1,6 +1,6 @@
 #include "state_machine.hpp"
 
-StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count)
+StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t led_count)
 {
   current_mode = BackgroundMode;
   this->selected_pattern = selected_pattern;
@@ -13,25 +13,31 @@ StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, ui
 void StateMachine::DecreaseColor(uint8_t color_setting_phase, uint32_t* color_x)
 {
   uint8_t color_offset = color_setting_phase * 8;
-  uint8_t color = (*color_x >> (color_offset)) & 0xFF;
+  uint32_t color = (*color_x >> color_offset) & (uint32_t)0x000000FF;
   color = color == 0 ? 0xFF : color - 1;
-  *color_x = ((color << (color_offset)) + *color_x & (~(0xFF << color_offset))) & 0x00FFFFFF;
+  uint32_t new_part = color << color_offset;
+  uint32_t old_part = *color_x & (~((uint32_t)0x000000FF << color_offset));
+  *color_x = (new_part + old_part) & (uint32_t)0x00FFFFFF;
 }
 
 void StateMachine::IncreaseColor(uint8_t color_setting_phase, uint32_t* color_x)
 {
   uint8_t color_offset = color_setting_phase * 8;
-  uint8_t color = (*color_x >> (color_offset)) & 0xFF;
+  uint32_t color = (*color_x >> color_offset) & (uint32_t)0x000000FF;
   color = color == 0xFF ? 0 : color + 1;
-  *color_x = ((color << (color_offset)) + *color_x & (~(0xFF << color_offset))) & 0x00FFFFFF;
+  uint32_t new_part = color << color_offset;
+  uint32_t old_part = *color_x & (~((uint32_t)0x000000FF << color_offset));
+  *color_x = (new_part + old_part) & (uint32_t)0x00FFFFFF;
 }
 
 void StateMachine::IncreaseColorStrongly(uint8_t color_setting_phase, uint32_t* color_x)
 {
   uint8_t color_offset = color_setting_phase * 8;
-  uint8_t color = (*color_x >> (color_offset)) & 0xFF;
-  color = ((uint16_t)color + StrongColorIncreaseDelta) % 0x100;
-  *color_x = ((color << (color_offset)) + *color_x & (~(0xFF << color_offset))) & 0x00FFFFFF;
+  uint32_t color = (*color_x >> color_offset) & (uint32_t)0x000000FF;
+  color = (color + StrongColorIncreaseDelta) % (uint32_t)0x00000100;
+  uint32_t new_part = color << color_offset;
+  uint32_t old_part = *color_x & (~((uint32_t)0x000000FF << color_offset));
+  *color_x = (new_part + old_part) & (uint32_t)0x00FFFFFF;
 }
 
 void StateMachine::ProcessColorSettingMode(ActionType action, uint32_t* color_a, uint32_t* color_b, ModeType next_mode)
@@ -60,7 +66,10 @@ void StateMachine::ProcessColorSettingMode(ActionType action, uint32_t* color_a,
       if (color_setting_phase < ColorSetPhaseCount - 1)
         ++color_setting_phase;
       else
+      {
+        color_setting_phase = 0;
         current_mode = next_mode;
+      }
       break;
   }
 }
@@ -72,9 +81,10 @@ void StateMachine::TransitState(ActionType action)
     case BackgroundMode:
       switch(action)
       {
-        case Select:
         case SelectLong:
           current_mode = LedCountSelectMode;
+          break;
+        case Select:
         case Mode:
         case ModeLong:
           current_mode = PatternSelectMode;
@@ -192,9 +202,14 @@ uint8_t StateMachine::GetSelectedColor4Option()
   return selected_color4;
 }
 
-uint8_t StateMachine::GetSelectedLedCount()
+uint16_t StateMachine::GetSelectedLedCount()
 {
   return led_count;
+}
+
+uint8_t StateMachine::GetColorSettingPhase()
+{
+  return color_setting_phase;
 }
 
 void StateMachine::GetSelectedColors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d)

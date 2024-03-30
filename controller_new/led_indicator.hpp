@@ -6,7 +6,7 @@
 #define LONG_SIGNAL_MS     1000
 #define SHORT_SIGNAL_MS     100
 
-#include <Arduino.h>
+#include "global.hpp"
 
 class LedIndicator
 {
