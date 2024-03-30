@@ -71,31 +71,40 @@ void Menu::ColorToHexString(uint8_t* color, uint8_t len, char* buffer)
 
 void Menu::PrintColorSelectMode(uint8_t pattern_index, uint8_t color, uint32_t set_color_0, uint32_t set_color_1, uint32_t set_color_2, uint32_t set_color_3)
 {
-  char raw0[17]; //"001122 334455 P0"
+  char raw0[17]; //"001122 334455 C4"
   char raw1[17]; //"667788 99AABB 32"
 
   ColorToHexString((uint8_t*) &set_color_0, 6, raw0);
   raw0[0x6] = ' ';
   ColorToHexString((uint8_t*) &set_color_1, 6, raw0 + 0x7);
   raw0[0xD] = ' ';
-  raw0[0xE] = 'P';
-  itoa(pattern_index, raw0 + 0xF, 10);
+  raw0[0xE] = 'C';
+  itoa(2 + 2 * pattern_index, raw0 + 0xF, 10);
   raw0[0x10] = '\0';
 
-  ColorToHexString((uint8_t*) &set_color_2, 6, raw1);
-  raw1[0x6] = ' ';
-  ColorToHexString((uint8_t*) &set_color_3, 6, raw1 + 0x7);
-  raw1[0xD] = ' ';
-  Print2DigitNumber(color, raw1 + 0xE);
-  raw1[0x10] = '\0';
+  if (pattern_index == 1)
+  {
+    ColorToHexString((uint8_t*) &set_color_2, 6, raw1);
+    raw1[0x6] = ' ';
+    ColorToHexString((uint8_t*) &set_color_3, 6, raw1 + 0x7);
+    raw1[0xD] = ' ';
+    Print2DigitNumber(color, raw1 + 0xE);
+    raw1[0x10] = '\0';
+  }
+  else 
+  {
+    memset(raw1, (int)' ', 0xE);
+    Print2DigitNumber(color, raw1 + 0xE);
+    raw1[0x10] = '\0';
+  }
   
   lcd->PrintAll(raw0, raw1);
 }
 
 void Menu::PrintColorSetMode(uint32_t set_color_0, uint32_t set_color_1, uint8_t color_setting_phase, uint8_t page)
 {
-  //"001122 < Color A"    "001122    vv    "
-  //"  ^^      99AABB"    "Color B > 99AABB"
+  //"001122 < Color A"    "Set blue  vv    "
+  //"  ^^   Set green"    "Color B > 99AABB"
   char col[7]; 
   char pointer[7];
   
@@ -150,7 +159,7 @@ void Menu::PrintSpeedSettings(uint16_t speed)
   lcd->PrintPlaySpeedWindow(buffer);
 }
 
-void Menu::RenderCurrentState(float current_amps, uint32_t set_color_0, uint32_t set_color_1, uint32_t set_color_2, uint32_t set_color_3)
+void Menu::RenderCurrentState(float current_amps)
 {
   StateMachine::ModeType mode_type = state_machine->GetCurrentMode();
   uint8_t pattern_index = state_machine->GetSelectedPattern();
@@ -175,7 +184,7 @@ void Menu::RenderCurrentState(float current_amps, uint32_t set_color_0, uint32_t
       lcd->PrintPatternDescription(pattern_index);
       break;
     case StateMachine::ColorSelectMode:
-      PrintColorSelectMode(pattern_index, pattern_index == 0 ? color2 : color4, set_color_0, set_color_1, set_color_2, set_color_3);
+      PrintColorSelectMode(pattern_index, pattern_index == 0 ? color2 : color4, color_a, color_b, color_c, color_d);
       break;
     case StateMachine::Color2SettingMode:
     case StateMachine::Color4Setting0Mode:

@@ -53,6 +53,7 @@ class StateMachine
     uint8_t GetSelectedColor4Option();
     uint16_t GetSelectedLedCount();
     void GetSelectedColors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
+    void SetSelectedColors(uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d);
     uint8_t GetColorSettingPhase();
   
   private:

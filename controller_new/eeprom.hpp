@@ -1,3 +1,4 @@
+#include <stdint.h>
 #ifndef __EEPROM__
 #define __EEPROM__
 
@@ -18,17 +19,29 @@ static const uint16_t SelectedPatternAddress = 0x6240;
 static const uint16_t Selected2ColorAddress  = 0x6241;
 static const uint16_t Selected4ColorAddress  = 0x6242;
 static const uint16_t SelectedSpeedAddress   = 0x6243; //uint16_t
-static const uint16_t SelectedLedCount       = 0x6245; 
+static const uint16_t SelectedLedCount       = 0x6245; //uint16_t
 
 class Eeprom
 {
   public:
     Eeprom();
 
-    byte Ping();
-    byte ReadByte(int address);
+    uint8_t Ping();
+    void ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint16_t* selected_speed, uint16_t* selected_led_count);
+    void SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t selected_led_count);
+    void ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b);
+    void ReadColor4Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
+    void SaveColor2Schema(uint8_t color_num, uint32_t color_a, uint32_t color_b);
+    void SaveColor4Schema(uint8_t color_num, uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d);
+
+  private:
+    uint8_t ReadByte(int address);
+    uint16_t ReadUint16(int address);
+    uint32_t ReadUint24(int address);
+    void WriteByte(int address, uint8_t data);
+    void WriteUint16(int address, uint16_t data);
+    void WriteUint24(int address, uint32_t data);
     void ReadData(int address, int size, byte* data);
-    void WriteData(int address, int size, byte* data);
 };
 
 #define LPEeprom Eeprom*

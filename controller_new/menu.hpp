@@ -1,4 +1,3 @@
-#include <stdint.h>
 #ifndef __MENU__
 #define __MENU__
 
@@ -10,7 +9,7 @@ class Menu
   public:
     Menu(LPLcd lcd, LPStateMachine state_machine);
     
-    void RenderCurrentState(float current_amps, uint32_t set_color_0, uint32_t set_color_1, uint32_t set_color_2, uint32_t set_color_3);
+    void RenderCurrentState(float current_amps);
 
   private:
     void PrintBackground(uint8_t pattern_index, uint8_t color, uint16_t speed, uint16_t led_count, float current_amps);

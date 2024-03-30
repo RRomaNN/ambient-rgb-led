@@ -219,3 +219,11 @@ void StateMachine::GetSelectedColors(uint32_t* color_a, uint32_t* color_b, uint3
   *color_c = color2;
   *color_d = color3;
 }
+
+void StateMachine::SetSelectedColors(uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d)
+{
+  color0 = color_a;
+  color1 = color_b;
+  color2 = color_c;
+  color3 = color_d;
+}
