@@ -3,6 +3,7 @@
 StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t led_count)
 {
   current_mode = BackgroundMode;
+
   this->selected_pattern = selected_pattern;
   this->selected_color2 = selected_color2;
   this->selected_color4 = selected_color4;

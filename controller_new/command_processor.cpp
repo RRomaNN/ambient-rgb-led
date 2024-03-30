@@ -1,9 +1,10 @@
 #include "command_processor.hpp"
 
-CommandProcessor::CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom)
+CommandProcessor::CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine)
 {
   this->state_machine = state_machine;
   this->eeprom = eeprom;
+  this->rendering_engine = rendering_engine;
 
   previous_mode = StateMachine::BackgroundMode;
 }
@@ -84,17 +85,28 @@ void CommandProcessor::ColorReSelection(StateMachine::ModeType current_mode)
   }
 }
 
-void CommandProcessor::ProcessStateChanges()
+void CommandProcessor::InitRendering(StateMachine::ModeType current_mode)
+{
+  if (current_mode == StateMachine::BackgroundMode)
+    rendering_engine->InitRendering(state_machine->GetSelectedPattern());
+}
+
+void CommandProcessor::ProcessStateChanges(bool just_started)
 {
   StateMachine::ModeType current_mode = state_machine->GetCurrentMode();
   if (current_mode != previous_mode)
   {
     SaveSelection(current_mode);
+    InitRendering(current_mode);
     InitialColorSelection(current_mode);
     SaveColor(current_mode);
 
     previous_mode = current_mode;
   }
   else
+  {
     ColorReSelection(current_mode);
+    if (just_started)
+      InitRendering(current_mode);
+  }
 }
