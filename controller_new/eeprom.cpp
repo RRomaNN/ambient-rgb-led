@@ -114,38 +114,29 @@ void Eeprom::WriteUint24(int address, uint32_t data)
   while (busStatus != 0x00);
 }
 
-void Eeprom::ReadData(int address, int size, byte* data)
+void Eeprom::ReadDataBlock(int address, uint8_t* data)
 {
-  int lastBlockBytes = size % RwBlockSize;
-  bool isLastBlockPartial = lastBlockBytes > 0;
-  int block_count = (size / RwBlockSize) + (isLastBlockPartial ? 1 : 0);
-
-  for (int i = 0; i < block_count; ++i)
+  Wire.beginTransmission(EepromAddress);
+  Wire.write((int)(address >> 8));   // MSB
+  Wire.write((int)(address & 0xFF)); // LSB
+  Wire.endTransmission();   
   {
-    int batchAddress = address + i * RwBlockSize;
-    Wire.beginTransmission(EepromAddress);
-    Wire.write((int)(batchAddress >> 8));   // MSB
-    Wire.write((int)(batchAddress & 0xFF)); // LSB
-    Wire.endTransmission();   
-    if (i < block_count - 1 || !isLastBlockPartial)
-    {
-      Wire.requestFrom((int)EepromAddress, (int)RwBlockSize);
-      while (!Wire.available()) 
-        delayMicroseconds(IdleTimeUs);
+    Wire.requestFrom((int)EepromAddress, (int)RwBlockSize);
+    while (!Wire.available()) 
+      delayMicroseconds(IdleTimeUs);
 
-      for(int j = 0; j < RwBlockSize; ++j)
-        data[i * RwBlockSize + j] = Wire.read();
-    }
-    else
-    {
-      Wire.requestFrom((int)EepromAddress, (int)lastBlockBytes);
-      while (!Wire.available()) 
-        delayMicroseconds(IdleTimeUs);
-
-      for(int j = 0; j < lastBlockBytes; ++j)
-        data[i * RwBlockSize + j] = Wire.read();
-    }
+    for(int i = 0; i < RwBlockSize; ++i)
+      data[i] = Wire.read();
   }
+}
+
+void Eeprom::ReadImageBlock(uint8_t pattern_index, uint8_t row, uint8_t block_number, uint8_t* data)
+{
+  int address = (pattern_index == 0) 
+    ? Pattern2ColorAddress + row * 0x20 + block_number * RwBlockSize
+    : Pattern4ColorAddress + row * 0x40 + block_number * RwBlockSize;
+
+  ReadDataBlock(address, data);
 }
 
 void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint16_t* selected_speed, uint16_t* selected_led_count)
@@ -154,7 +145,7 @@ void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_colo
   *selected_color2 = ReadByte(Selected2ColorAddress);
   *selected_color4 = ReadByte(Selected4ColorAddress);
   *selected_speed = ReadUint16(SelectedSpeedAddress);
-  *selected_led_count = ReadUint16(SelectedLedCount);
+  *selected_led_count = ReadUint16(LedCountAddress);
 }
 
 void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t selected_led_count)
@@ -163,7 +154,7 @@ void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uin
   WriteByte(Selected2ColorAddress, selected_color2);
   WriteByte(Selected4ColorAddress, selected_color4);
   WriteUint16(SelectedSpeedAddress, selected_speed);
-  WriteUint16(SelectedLedCount, selected_led_count);
+  WriteUint16(LedCountAddress, selected_led_count);
 }
 
 void Eeprom::ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b)

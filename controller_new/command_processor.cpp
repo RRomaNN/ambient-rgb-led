@@ -88,10 +88,10 @@ void CommandProcessor::ColorReSelection(StateMachine::ModeType current_mode)
 void CommandProcessor::InitRendering(StateMachine::ModeType current_mode)
 {
   if (current_mode == StateMachine::BackgroundMode)
-    rendering_engine->InitRendering(state_machine->GetSelectedPattern());
+    rendering_engine->InitRendering();
 }
 
-void CommandProcessor::ProcessStateChanges(bool just_started)
+void CommandProcessor::ProcessStateChanges()
 {
   StateMachine::ModeType current_mode = state_machine->GetCurrentMode();
   if (current_mode != previous_mode)
@@ -106,7 +106,5 @@ void CommandProcessor::ProcessStateChanges(bool just_started)
   else
   {
     ColorReSelection(current_mode);
-    if (just_started)
-      InitRendering(current_mode);
   }
 }

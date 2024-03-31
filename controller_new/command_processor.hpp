@@ -9,7 +9,7 @@ class CommandProcessor
 {
   public:
     CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine);
-    void ProcessStateChanges(bool just_started);
+    void ProcessStateChanges();
 
   private:
     void SaveSelection(StateMachine::ModeType current_mode);

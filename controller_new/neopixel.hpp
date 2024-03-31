@@ -12,8 +12,9 @@ class NeoPixel
     NeoPixel(uint8_t led_count);
     ~NeoPixel();
 
-    void SetNeoPixelColors(byte* intensities);
     void SetLedCount(byte led_count);
+    void SetNeoPixelColor(uint16_t pixel_num, uint8_t red, uint8_t green, uint8_t blue, uint8_t white);
+    void Display();
     void ShutDown();
   
   private:

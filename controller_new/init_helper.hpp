@@ -1,4 +1,3 @@
-#include <stdint.h>
 #ifndef __INIT_HELPER__
 #define __INIT_HELPER__
 

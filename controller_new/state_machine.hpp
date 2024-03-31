@@ -1,6 +1,7 @@
-#include <stdint.h>
 #ifndef __STATE_MACHINE__
 #define __STATE_MACHINE__
+
+#include "global.hpp"
 
 //User option settings
 static const uint8_t PatternCount = 2;
@@ -15,8 +16,6 @@ static const uint16_t SlowestChangeSpeed = 0x200;
 
 static const uint8_t  FastLedCountChangeDelta = 0x10;
 static const uint16_t MaxLedCount = 0x100;
-
-#include "global.hpp"
 
 class StateMachine
 {

@@ -9,10 +9,13 @@ NeoPixel::NeoPixel(uint8_t led_count)
   neopixel->setBrightness(DEFAULT_LED_BRIGHTNESS);
 }
 
-void NeoPixel::SetNeoPixelColors(byte* intensities)
+void NeoPixel::SetNeoPixelColor(uint16_t pixel_num, uint8_t red, uint8_t green, uint8_t blue, uint8_t white)
 {
-  for(int i = 0; i < led_count; ++i) 
-    neopixel->setPixelColor(i, intensities[i * 3], intensities[i * 3 + 1], intensities[i * 3 + 2], intensities[i * 3 + 3]);
+  neopixel->setPixelColor(pixel_num, red, green, blue, white);
+}
+
+void NeoPixel::Display()
+{
   neopixel->show();
 }
 
