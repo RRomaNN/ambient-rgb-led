@@ -14,6 +14,7 @@ void CommandProcessor::SaveSelection(StateMachine::ModeType current_mode)
 {
   if (current_mode == StateMachine::BackgroundMode && (previous_mode == StateMachine::SpeedSelectMode || previous_mode == StateMachine::PreviewColorMode)
     || current_mode == StateMachine::RestartNeededMode && previous_mode == StateMachine::SelectStripTypeMode)
+  {
     eeprom->SaveSettings(
       state_machine->GetSelectedPattern(), 
       state_machine->GetSelectedColor2Option(), 
@@ -22,6 +23,9 @@ void CommandProcessor::SaveSelection(StateMachine::ModeType current_mode)
       state_machine->GetSelectedLedCount(),
       state_machine->GetPreviewColorMode(),
       state_machine->IsRgbwStrip());
+      
+    led_indicatior->Blink(2, SHORT_SIGNAL_MS, SHORT_SIGNAL_MS);
+  }
 }
 
 void CommandProcessor::InitialColorSelection(StateMachine::ModeType current_mode)
