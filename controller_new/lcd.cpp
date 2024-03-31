@@ -81,6 +81,14 @@ void Lcd::PrintPlaySpeedWindow(char* play_speed)
   lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0xA]));
 }
 
+void Lcd::PrintPreviewColorsWindow(bool preview_colors)
+{
+  lcd->setCursor(0, 0);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x16]));
+  lcd->setCursor(0, 1);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[preview_colors ? 0x17 : 0x18]));
+}
+
 void Lcd::Print(uint8_t row, const char* text)
 {
   uint8_t buffer[0x11];

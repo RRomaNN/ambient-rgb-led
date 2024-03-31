@@ -11,14 +11,15 @@ CommandProcessor::CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom
 
 void CommandProcessor::SaveSelection(StateMachine::ModeType current_mode)
 {
-  if (current_mode == StateMachine::BackgroundMode && previous_mode == StateMachine::SpeedSelectMode)
-    //Save settings to EEPROM
+  if (current_mode == StateMachine::BackgroundMode && 
+    (previous_mode == StateMachine::SpeedSelectMode || previous_mode == StateMachine::LedCountSelectMode || previous_mode == StateMachine::PreviewColorMode))
     eeprom->SaveSettings(
       state_machine->GetSelectedPattern(), 
       state_machine->GetSelectedColor2Option(), 
       state_machine->GetSelectedColor4Option(), 
       state_machine->GetSelectedSpeed(), 
-      state_machine->GetSelectedLedCount());
+      state_machine->GetSelectedLedCount(),
+      state_machine->GetPreviewColorMode());
 }
 
 void CommandProcessor::InitialColorSelection(StateMachine::ModeType current_mode)

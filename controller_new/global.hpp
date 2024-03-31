@@ -25,12 +25,15 @@ const static char ColorSettingModeB[]        PROGMEM = "Color B > ";
 const static char ColorSettingModeC[]        PROGMEM =       " < Color C";
 const static char ColorSettingModeD[]        PROGMEM = "Color D > ";
 const static char SelectSpeed[]              PROGMEM = "Set play speed  ";
-const static char ColorSettingRed0[]          PROGMEM = "   Set red";
-const static char ColorSettingGreen0[]        PROGMEM = " Set green";
-const static char ColorSettingBlue0[]         PROGMEM = "  Set blue";
-const static char ColorSettingRed1[]          PROGMEM = "Set red   ";
-const static char ColorSettingGreen1[]        PROGMEM = "Set green ";
-const static char ColorSettingBlue1[]         PROGMEM = "Set blue  ";
+const static char ColorSettingRed0[]         PROGMEM = "   Set red";
+const static char ColorSettingGreen0[]       PROGMEM = " Set green";
+const static char ColorSettingBlue0[]        PROGMEM = "  Set blue";
+const static char ColorSettingRed1[]         PROGMEM = "Set red   ";
+const static char ColorSettingGreen1[]       PROGMEM = "Set green ";
+const static char ColorSettingBlue1[]        PROGMEM = "Set blue  ";
+const static char PreviewColorsH[]           PROGMEM = "Preview colors ?";
+const static char PreviewColorsYes[]         PROGMEM = "<      Yes     >";
+const static char PreviewColorsNo[]          PROGMEM = "<      No      >";
 
 const char* const StringTable[] PROGMEM = 
 { 
@@ -56,6 +59,9 @@ const char* const StringTable[] PROGMEM =
   ColorSettingRed1,          //13
   ColorSettingGreen1,        //14
   ColorSettingBlue1,         //15 
+  PreviewColorsH,            //16
+  PreviewColorsYes,          //17
+  PreviewColorsNo            //18
 };
 
 #endif

@@ -168,6 +168,7 @@ void Menu::RenderCurrentState(float current_amps)
   uint16_t speed = state_machine->GetSelectedSpeed();
   uint8_t led_count = state_machine->GetSelectedLedCount();
   uint8_t color_setting_phase = state_machine->GetColorSettingPhase();
+  bool preview_colors = state_machine->GetPreviewColorMode();
 
   uint32_t color_a, color_b, color_c, color_d;
   state_machine->GetSelected4Colors(&color_a, &color_b, &color_c, &color_d);
@@ -195,6 +196,9 @@ void Menu::RenderCurrentState(float current_amps)
       break;
     case StateMachine::SpeedSelectMode:
       PrintSpeedSettings(speed);
+      break;
+    case StateMachine::PreviewColorMode:
+      lcd->PrintPreviewColorsWindow(preview_colors);
       break;
   }
 }

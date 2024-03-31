@@ -19,7 +19,7 @@ static const uint8_t MaxLedCount = 225;
 class StateMachine
 {
   public:
-    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count);
+    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count, bool preview_colors);
 
     //Types
     enum ModeType 
@@ -51,11 +51,13 @@ class StateMachine
     uint8_t GetSelectedColor2Option();
     uint8_t GetSelectedColor4Option();
     uint8_t GetSelectedLedCount();
+    bool GetPreviewColorMode();
     void GetSelected2Colors(uint32_t* color_a, uint32_t* color_b);
     void GetSelected4Colors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
     void SetSelectedColors(uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d);
     uint8_t GetColorSettingPhase();
-  
+    bool IsRenderingEnabled();
+ 
   private:
     void ProcessColorSettingMode(ActionType action, uint32_t* color_a, uint32_t* color_b, ModeType next_mode);
     void DecreaseColor(uint8_t color_setting_phase, uint32_t* color_x);
@@ -69,6 +71,7 @@ class StateMachine
     uint8_t selected_color4;
     uint16_t selected_speed;
     uint8_t led_count;
+    bool preview_colors;
 
     uint32_t color0;
     uint32_t color1;

@@ -18,14 +18,12 @@ LPCommandProcessor command_processor;
 LPRendringEngine rendering_engine;
 
 bool global_lock;
-bool active_rendering;
 uint8_t menu_counter;
 bool need_to_refresh_menu;
 
 void setup() 
 {
   global_lock = false;
-  active_rendering = true;
   menu_counter = 0;
   need_to_refresh_menu = true;
 
@@ -49,9 +47,10 @@ void setup()
 
   uint8_t selected_pattern, selected_color2, selected_color4, strip_led_count;
   uint16_t selected_speed;
-  eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count);
+  bool preview_colors;
+  eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count, &preview_colors);
 
-  state_machine = new StateMachine(selected_pattern, selected_color2, selected_color4, selected_speed, strip_led_count);
+  state_machine = new StateMachine(selected_pattern, selected_color2, selected_color4, selected_speed, strip_led_count, preview_colors);
   uint32_t color_a, color_b, color_c = 0x0, color_d = 0x0;
   if (selected_pattern == 0)
     eeprom->ReadColor2Schema(selected_color2, &color_a, &color_b);
@@ -77,8 +76,10 @@ void loop()
 
   command_processor->ProcessStateChanges();
 
-  if (active_rendering)
+  if (state_machine->IsRenderingEnabled())
     rendering_engine->Render();
+  else
+    neopixel->ShutDown();
 
   if (menu_counter == 0xFF || need_to_refresh_menu)
   {

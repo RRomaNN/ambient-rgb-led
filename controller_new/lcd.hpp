@@ -25,6 +25,7 @@ class Lcd
     void PrintLedSettingWindow(char* led_count);
     void PrintColorSettingWindow(char* hex_string, char* pointer, uint8_t phase_index, uint8_t page, uint8_t sub_phase);
     void PrintPlaySpeedWindow(char* play_speed);
+    void PrintPreviewColorsWindow(bool preview_colors);
 
   private:
     LiquidCrystal* lcd;

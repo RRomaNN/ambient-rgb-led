@@ -1,6 +1,6 @@
 #include "state_machine.hpp"
 
-StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count)
+StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count, bool preview_colors)
 {
   current_mode = BackgroundMode;
 
@@ -9,6 +9,7 @@ StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, ui
   this->selected_color4 = selected_color4;
   this->selected_speed = selected_speed;
   this->led_count = led_count;
+  this->preview_colors = preview_colors;
 }
 
 void StateMachine::DecreaseColor(uint8_t color_setting_phase, uint32_t* color_x)
@@ -86,6 +87,8 @@ void StateMachine::TransitState(ActionType action)
           current_mode = LedCountSelectMode;
           break;
         case Select:
+          current_mode = PreviewColorMode;
+          break;
         case Mode:
         case ModeLong:
           current_mode = PatternSelectMode;
@@ -175,6 +178,19 @@ void StateMachine::TransitState(ActionType action)
             break;
         }
       break;
+    case PreviewColorMode:
+      switch(action)
+      {
+        case Select:
+        case Mode:
+        case SelectLong:
+          preview_colors = !preview_colors;
+          break;
+        case ModeLong:
+          current_mode = BackgroundMode;
+          break;
+      }
+      break;
   }
 }
 
@@ -211,6 +227,16 @@ uint8_t StateMachine::GetSelectedLedCount()
 uint8_t StateMachine::GetColorSettingPhase()
 {
   return color_setting_phase;
+}
+
+bool StateMachine::GetPreviewColorMode()
+{
+  return preview_colors;
+}
+
+bool StateMachine::IsRenderingEnabled()
+{
+  return preview_colors || current_mode == BackgroundMode;
 }
 
 void StateMachine::GetSelected2Colors(uint32_t* color_a, uint32_t* color_b)
