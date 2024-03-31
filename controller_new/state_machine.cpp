@@ -1,6 +1,6 @@
 #include "state_machine.hpp"
 
-StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t led_count)
+StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count)
 {
   current_mode = BackgroundMode;
 
@@ -203,7 +203,7 @@ uint8_t StateMachine::GetSelectedColor4Option()
   return selected_color4;
 }
 
-uint16_t StateMachine::GetSelectedLedCount()
+uint8_t StateMachine::GetSelectedLedCount()
 {
   return led_count;
 }
@@ -213,7 +213,13 @@ uint8_t StateMachine::GetColorSettingPhase()
   return color_setting_phase;
 }
 
-void StateMachine::GetSelectedColors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d)
+void StateMachine::GetSelected2Colors(uint32_t* color_a, uint32_t* color_b)
+{
+  *color_a = color0;
+  *color_b = color1;
+}
+
+void StateMachine::GetSelected4Colors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d)
 {
   *color_a = color0;
   *color_b = color1;

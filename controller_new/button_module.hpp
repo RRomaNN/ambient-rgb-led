@@ -5,7 +5,7 @@
 #define MODE_BUTTON_GPIO_PIN           A3
 
 #define SHORT_BUTTON_PRESS_MIN_COUNT    3
-#define LONG_BUTTON_PRESS_MIN_COUNT    50
+#define LONG_BUTTON_PRESS_MIN_COUNT    25
 
 #define BUTTON_ADC_THRESHOLD          512
 
@@ -37,8 +37,6 @@ class ButtonModule
     };
 
     enum ButtonAction button_action;
-
-    //How long the button has been pressed
     int clock_count;
     enum ButtonType active_button;
 };

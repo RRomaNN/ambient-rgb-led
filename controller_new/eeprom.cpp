@@ -139,22 +139,22 @@ void Eeprom::ReadImageBlock(uint8_t pattern_index, uint8_t row, uint8_t block_nu
   ReadDataBlock(address, data);
 }
 
-void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint16_t* selected_speed, uint16_t* selected_led_count)
+void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint16_t* selected_speed, uint8_t* selected_led_count)
 {
   *selected_pattern = ReadByte(SelectedPatternAddress);
   *selected_color2 = ReadByte(Selected2ColorAddress);
   *selected_color4 = ReadByte(Selected4ColorAddress);
   *selected_speed = ReadUint16(SelectedSpeedAddress);
-  *selected_led_count = ReadUint16(LedCountAddress);
+  *selected_led_count = ReadByte(LedCountAddress);
 }
 
-void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t selected_led_count)
+void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t selected_led_count)
 {
   WriteByte(SelectedPatternAddress, selected_pattern);
   WriteByte(Selected2ColorAddress, selected_color2);
   WriteByte(Selected4ColorAddress, selected_color4);
   WriteUint16(SelectedSpeedAddress, selected_speed);
-  WriteUint16(LedCountAddress, selected_led_count);
+  WriteByte(LedCountAddress, selected_led_count);
 }
 
 void Eeprom::ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b)

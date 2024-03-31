@@ -3,7 +3,6 @@
 
 #include "global.hpp"
 
-//User option settings
 static const uint8_t PatternCount = 2;
 static const uint8_t ColorCount = 32;
 
@@ -14,13 +13,13 @@ static const uint8_t  StrongColorIncreaseDelta = 0x10;
 static const uint8_t  FastSpeedChangeDelta = 0x20;
 static const uint16_t SlowestChangeSpeed = 0x200;
 
-static const uint8_t  FastLedCountChangeDelta = 0x10;
-static const uint16_t MaxLedCount = 0x100;
+static const uint8_t FastLedCountChangeDelta = 0x10;
+static const uint8_t MaxLedCount = 225;
 
 class StateMachine
 {
   public:
-    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint16_t led_count);
+    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count);
 
     //Types
     enum ModeType 
@@ -33,6 +32,7 @@ class StateMachine
       Color4Setting0Mode = 5,
       Color4Setting1Mode = 6,
       SpeedSelectMode = 7,
+      PreviewColorMode = 8,
       UndefinedMode = 99
     };
 
@@ -50,8 +50,9 @@ class StateMachine
     uint16_t GetSelectedSpeed();
     uint8_t GetSelectedColor2Option();
     uint8_t GetSelectedColor4Option();
-    uint16_t GetSelectedLedCount();
-    void GetSelectedColors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
+    uint8_t GetSelectedLedCount();
+    void GetSelected2Colors(uint32_t* color_a, uint32_t* color_b);
+    void GetSelected4Colors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
     void SetSelectedColors(uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d);
     uint8_t GetColorSettingPhase();
   
@@ -67,7 +68,7 @@ class StateMachine
     uint8_t selected_color2;
     uint8_t selected_color4;
     uint16_t selected_speed;
-    uint16_t led_count;
+    uint8_t led_count;
 
     uint32_t color0;
     uint32_t color1;

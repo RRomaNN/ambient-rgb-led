@@ -34,7 +34,7 @@ void Menu::Print2DigitNumber(uint8_t number, char* buffer)
     itoa(number, buffer + 0x0, 10);
 }
 
-void Menu::PrintBackground(uint8_t pattern_index, uint8_t color, uint16_t speed, uint16_t led_count, float current_amps)
+void Menu::PrintBackground(uint8_t pattern_index, uint8_t color, uint16_t speed, uint8_t led_count, float current_amps)
 {
   //"P0 C32 S512 L256"
   //"Current: 2.120 A"
@@ -145,7 +145,7 @@ void Menu::PrintColorSetMode(uint32_t set_color_0, uint32_t set_color_1, uint8_t
   lcd->PrintColorSettingWindow(col, pointer, phase_index, page, sub_phase);
 }
 
-void Menu::PrintLedSettings(uint16_t led_count)
+void Menu::PrintLedSettings(uint8_t led_count)
 {
   char buffer[4];
   Print3DigitNumber(led_count, buffer);
@@ -166,11 +166,11 @@ void Menu::RenderCurrentState(float current_amps)
   uint8_t color2 = state_machine->GetSelectedColor2Option();
   uint8_t color4 = state_machine->GetSelectedColor4Option();
   uint16_t speed = state_machine->GetSelectedSpeed();
-  uint16_t led_count = state_machine->GetSelectedLedCount();
+  uint8_t led_count = state_machine->GetSelectedLedCount();
   uint8_t color_setting_phase = state_machine->GetColorSettingPhase();
 
   uint32_t color_a, color_b, color_c, color_d;
-  state_machine->GetSelectedColors(&color_a, &color_b, &color_c, &color_d);
+  state_machine->GetSelected4Colors(&color_a, &color_b, &color_c, &color_d);
 
   switch(mode_type)
   {

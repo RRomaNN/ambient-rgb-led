@@ -47,7 +47,7 @@ void CommandProcessor::SaveColor(StateMachine::ModeType current_mode)
   if (current_mode == StateMachine::SpeedSelectMode)
   {
     uint32_t color_a, color_b, color_c, color_d;
-    state_machine->GetSelectedColors(&color_a, &color_b, &color_c, &color_d);
+    state_machine->GetSelected4Colors(&color_a, &color_b, &color_c, &color_d);
 
     if (state_machine->GetSelectedPattern() == 0)
       eeprom->SaveColor2Schema(state_machine->GetSelectedColor2Option(), color_a, color_b);
@@ -85,19 +85,12 @@ void CommandProcessor::ColorReSelection(StateMachine::ModeType current_mode)
   }
 }
 
-void CommandProcessor::InitRendering(StateMachine::ModeType current_mode)
-{
-  if (current_mode == StateMachine::BackgroundMode)
-    rendering_engine->InitRendering();
-}
-
 void CommandProcessor::ProcessStateChanges()
 {
   StateMachine::ModeType current_mode = state_machine->GetCurrentMode();
   if (current_mode != previous_mode)
   {
     SaveSelection(current_mode);
-    InitRendering(current_mode);
     InitialColorSelection(current_mode);
     SaveColor(current_mode);
 

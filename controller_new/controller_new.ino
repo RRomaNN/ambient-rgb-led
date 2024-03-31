@@ -19,11 +19,15 @@ LPRendringEngine rendering_engine;
 
 bool global_lock;
 bool active_rendering;
+uint8_t menu_counter;
+bool need_to_refresh_menu;
 
 void setup() 
 {
   global_lock = false;
   active_rendering = true;
+  menu_counter = 0;
+  need_to_refresh_menu = true;
 
   InitHelper::InitGpioPins();
   InitHelper::InitI2C();
@@ -43,8 +47,8 @@ void setup()
     global_lock = true;
   }
 
-  uint8_t selected_pattern, selected_color2, selected_color4;
-  uint16_t selected_speed, strip_led_count;
+  uint8_t selected_pattern, selected_color2, selected_color4, strip_led_count;
+  uint16_t selected_speed;
   eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count);
 
   state_machine = new StateMachine(selected_pattern, selected_color2, selected_color4, selected_speed, strip_led_count);
@@ -76,17 +80,23 @@ void loop()
   if (active_rendering)
     rendering_engine->Render();
 
-  float current_amps = pwr_controller->AuditPowerStatusAndAct();
-  menu->RenderCurrentState(current_amps);
+  if (menu_counter == 0xFF || need_to_refresh_menu)
+  {
+    float current_amps = pwr_controller->AuditPowerStatusAndAct();
+    menu->RenderCurrentState(current_amps);
+    menu_counter = 0;
+    need_to_refresh_menu = false;
+  }
 
   ButtonModule::ButtonAction action = button_module->GetCurrentButtonAction();
   if (action == ButtonModule::ButtonMode || action == ButtonModule::ButtonModeLong 
     || action == ButtonModule::ButtonSelect || action == ButtonModule::ButtonSelectLong)
   {
-    //Convert enum to enum with shift
     StateMachine::ActionType action_type = (StateMachine::ActionType)((int)action - 2);
     state_machine->TransitState(action_type);
+    need_to_refresh_menu = true;
   }
 
+  ++menu_counter;
   delayMicroseconds(IdleTimeUs);
 }

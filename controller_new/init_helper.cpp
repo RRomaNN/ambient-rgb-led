@@ -15,13 +15,10 @@ void InitHelper::InitDigitalOutput(uint8_t gpio, uint8_t init_state)
 
 void InitHelper::InitGpioPins()
 {
-  //Buttons... 
   pinMode(MODE_BUTTON_GPIO_PIN, INPUT);
   pinMode(SELECT_BUTTON_GPIO_PIN, INPUT);
 
-  //LEDs...
   InitDigitalOutput(SYS_LED_GPIO_PIN, LOW);
 
-  //Sensors/inputs...
   pinMode(CurrentMeterPin, INPUT);
 }
