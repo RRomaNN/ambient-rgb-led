@@ -89,6 +89,30 @@ void Lcd::PrintPreviewColorsWindow(bool preview_colors)
   lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[preview_colors ? 0x17 : 0x18]));
 }
 
+void Lcd::PrintStripTypeSelection(bool is_rgbw_strip)
+{
+  lcd->setCursor(0, 0);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x1B]));
+  lcd->setCursor(0, 1);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[is_rgbw_strip ? 0x1D : 0x1C]));
+}
+
+void Lcd::PrintRestartIsNeeded()
+{
+  lcd->setCursor(0, 0);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x1E]));
+  lcd->setCursor(0, 1);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x1F]));
+}
+
+void Lcd::PrintRePlugIsNeeded()
+{
+  lcd->setCursor(0, 0);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x20]));
+  lcd->setCursor(0, 1);
+  lcd->print((__FlashStringHelper*)pgm_read_word(&StringTable[0x21]));
+}
+
 void Lcd::Print(uint8_t row, const char* text)
 {
   uint8_t buffer[0x11];

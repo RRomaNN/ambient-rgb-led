@@ -18,6 +18,7 @@ static const uint16_t Selected4ColorAddress  = 0x6242;
 static const uint16_t SelectedSpeedAddress   = 0x6243;
 static const uint16_t LedCountAddress        = 0x6244; 
 static const uint16_t PreviewLedAddress      = 0x6245; 
+static const uint16_t IsRgbwTypeLedAddress   = 0x6246; 
 
 class Eeprom
 {
@@ -25,8 +26,8 @@ class Eeprom
     Eeprom();
 
     uint8_t Ping();
-    void ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint8_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors);
-    void SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t selected_led_count, bool preview_colors);
+    void ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint8_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors, bool* is_rgbw_strip);
+    void SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t selected_led_count, bool preview_colors, bool is_rgbw_strip);
     void ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b);
     void ReadColor4Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
     void SaveColor2Schema(uint8_t color_num, uint32_t color_a, uint32_t color_b);

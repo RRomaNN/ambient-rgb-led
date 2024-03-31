@@ -104,7 +104,7 @@ void Eeprom::ReadImageBlock(uint8_t pattern_index, uint8_t row, uint8_t block_nu
   ReadDataBlock(address, data);
 }
 
-void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint8_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors)
+void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint8_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors, bool* is_rgbw_strip)
 {
   *selected_pattern = ReadByte(SelectedPatternAddress);
   *selected_color2 = ReadByte(Selected2ColorAddress);
@@ -112,9 +112,10 @@ void Eeprom::ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_colo
   *selected_speed = ReadByte(SelectedSpeedAddress);
   *selected_led_count = ReadByte(LedCountAddress);
   *preview_colors = ReadByte(PreviewLedAddress) > 0;
+  *is_rgbw_strip = ReadByte(IsRgbwTypeLedAddress) > 0;
 }
 
-void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t selected_led_count, bool preview_colors)
+void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t selected_led_count, bool preview_colors, bool is_rgbw_strip)
 {
   WriteByte(SelectedPatternAddress, selected_pattern);
   WriteByte(Selected2ColorAddress, selected_color2);
@@ -122,6 +123,7 @@ void Eeprom::SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uin
   WriteByte(SelectedSpeedAddress, selected_speed);
   WriteByte(LedCountAddress, selected_led_count);
   WriteByte(PreviewLedAddress, preview_colors ? 0x01 : 0x00);
+  WriteByte(IsRgbwTypeLedAddress, is_rgbw_strip ? 0x01 : 0x00);
 }
 
 void Eeprom::ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b)

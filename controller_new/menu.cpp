@@ -200,7 +200,6 @@ void Menu::RenderCurrentState(float current_amps)
   uint16_t speed = state_machine->GetSelectedSpeed();
   uint8_t led_count = state_machine->GetSelectedLedCount();
   uint8_t color_setting_phase = state_machine->GetColorSettingPhase();
-  bool preview_colors = state_machine->GetPreviewColorMode();
 
   uint32_t color_a, color_b, color_c, color_d;
   state_machine->GetSelected4Colors(&color_a, &color_b, &color_c, &color_d);
@@ -230,7 +229,16 @@ void Menu::RenderCurrentState(float current_amps)
       PrintSpeedSettings(state_machine->GetLogarithmicSpeed());
       break;
     case StateMachine::PreviewColorMode:
-      lcd->PrintPreviewColorsWindow(preview_colors);
+      lcd->PrintPreviewColorsWindow(state_machine->GetPreviewColorMode());
       break;
+    case StateMachine::SelectStripTypeMode:
+      lcd->PrintStripTypeSelection(state_machine->IsRgbwStrip());
+      break;
+    case StateMachine::RestartNeededMode:
+      lcd->PrintRestartIsNeeded();
+      break;
+    case StateMachine::RestartIsReallyNeededMode:
+      lcd->PrintRePlugIsNeeded();
+      break;    
   }
 }

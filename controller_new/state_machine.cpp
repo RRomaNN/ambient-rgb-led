@@ -1,6 +1,6 @@
 #include "state_machine.hpp"
 
-StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors)
+StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors, bool is_rgbw_strip)
 {
   current_mode = BackgroundMode;
 
@@ -10,6 +10,7 @@ StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, ui
   this->selected_speed = selected_speed;
   this->led_count = led_count;
   this->preview_colors = preview_colors;
+  this->is_rgbw_strip = is_rgbw_strip;
 }
 
 void StateMachine::DecreaseColor(uint8_t color_setting_phase, uint32_t* color_x)
@@ -108,7 +109,7 @@ void StateMachine::TransitState(ActionType action)
             led_count = (led_count == MaxLedCount) ? 0 : led_count + 1;
             break;
           case ModeLong:
-            current_mode = BackgroundMode;
+            current_mode = SelectStripTypeMode;
             break;
         }
       break;
@@ -191,6 +192,30 @@ void StateMachine::TransitState(ActionType action)
           break;
       }
       break;
+    case SelectStripTypeMode:
+      switch(action)
+      {
+        case Select:
+        case Mode:
+        case SelectLong:
+          is_rgbw_strip = !is_rgbw_strip;
+          break;
+        case ModeLong:
+          current_mode = RestartNeededMode;
+          break;
+      }
+      break;
+    case RestartNeededMode:
+      switch(action)
+      {
+        case Select:
+        case Mode:
+        case SelectLong:
+        case ModeLong:
+          current_mode = RestartIsReallyNeededMode;
+          break;
+      }
+      break;
   }
 }
 
@@ -242,6 +267,11 @@ bool StateMachine::IsRenderingEnabled()
 uint16_t StateMachine::GetLogarithmicSpeed()
 {
   return (uint16_t) pow(2., (float)selected_speed / 10);
+}
+
+bool StateMachine::IsRgbwStrip()
+{
+  return is_rgbw_strip;
 }
 
 void StateMachine::GetSelected2Colors(uint32_t* color_a, uint32_t* color_b)

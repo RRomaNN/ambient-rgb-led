@@ -46,10 +46,10 @@ void setup()
   }
 
   uint8_t selected_pattern, selected_color2, selected_color4, strip_led_count, selected_speed;
-  bool preview_colors;
-  eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count, &preview_colors);
+  bool preview_colors, is_rgbw_strip;
+  eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count, &preview_colors, &is_rgbw_strip);
 
-  state_machine = new StateMachine(selected_pattern, selected_color2, selected_color4, selected_speed, strip_led_count, preview_colors);
+  state_machine = new StateMachine(selected_pattern, selected_color2, selected_color4, selected_speed, strip_led_count, preview_colors, is_rgbw_strip);
   uint32_t color_a, color_b, color_c = 0x0, color_d = 0x0;
   if (selected_pattern == 0)
     eeprom->ReadColor2Schema(selected_color2, &color_a, &color_b);
@@ -57,7 +57,7 @@ void setup()
     eeprom->ReadColor4Schema(selected_color4, &color_a, &color_b, &color_c, &color_d);
   state_machine->SetSelectedColors(color_a, color_b, color_c, color_d);
 
-  neopixel = new NeoPixel(strip_led_count);
+  neopixel = new NeoPixel(strip_led_count, is_rgbw_strip);
   rendering_engine = new RendringEngine(state_machine, eeprom, neopixel);
   command_processor = new CommandProcessor(state_machine, eeprom, rendering_engine);
   menu = new Menu(lcd, state_machine);

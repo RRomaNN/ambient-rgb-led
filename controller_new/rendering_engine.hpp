@@ -20,8 +20,10 @@ class RendringEngine
   private:
     inline uint8_t GetWhiteComponent(uint8_t red, uint8_t green, uint8_t blue);
     inline void GetColorComponents(uint8_t* red, uint8_t* green, uint8_t* blue, uint32_t color);
-    inline void Render2Colors(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
-    inline void Render4Colors(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
+    inline void Render2ColorsRgbw(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
+    inline void Render4ColorsRgbw(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
+    inline void Render2ColorsRgb(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
+    inline void Render4ColorsRgb(uint8_t next_row, uint8_t led_count, float newFraction, float oldFraction);
 
     LPStateMachine state_machine;
     LPEeprom eeprom;

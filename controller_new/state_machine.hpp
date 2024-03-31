@@ -19,7 +19,7 @@ static const uint8_t MaxLedCount = 225;
 class StateMachine
 {
   public:
-    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors);
+    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors, bool is_rgbw_strip);
 
     //Types
     enum ModeType 
@@ -33,6 +33,9 @@ class StateMachine
       Color4Setting1Mode = 6,
       SpeedSelectMode = 7,
       PreviewColorMode = 8,
+      SelectStripTypeMode = 9,
+      RestartNeededMode = 10,
+      RestartIsReallyNeededMode = 11,
       UndefinedMode = 99
     };
 
@@ -53,6 +56,7 @@ class StateMachine
     uint8_t GetSelectedColor4Option();
     uint8_t GetSelectedLedCount();
     bool GetPreviewColorMode();
+    bool IsRgbwStrip();
     void GetSelected2Colors(uint32_t* color_a, uint32_t* color_b);
     void GetSelected4Colors(uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
     void SetSelectedColors(uint32_t color_a, uint32_t color_b, uint32_t color_c, uint32_t color_d);
@@ -73,6 +77,7 @@ class StateMachine
     uint8_t selected_speed;
     uint8_t led_count;
     bool preview_colors;
+    bool is_rgbw_strip;
 
     uint32_t color0;
     uint32_t color1;

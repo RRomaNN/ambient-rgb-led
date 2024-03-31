@@ -36,6 +36,13 @@ const static char PreviewColorsYes[]         PROGMEM = "<      Yes     >";
 const static char PreviewColorsNo[]          PROGMEM = "<      No      >";
 const static char SelectSpeed0[]             PROGMEM = "<    ";
 const static char SelectSpeed1[]             PROGMEM =           "     >";
+const static char LedStripType[]             PROGMEM = "LED strip type  ";
+const static char LedStripTypeRGB[]          PROGMEM = "<     RGB      >";
+const static char LedStripTypeRGBW[]         PROGMEM = "<     RGBW     >";
+const static char RestartRequired0[]         PROGMEM = "Please restart  ";
+const static char RestartRequired1[]         PROGMEM = "to apply changes";
+const static char RestartReallyRequired0[]   PROGMEM = "Please re-plug  ";
+const static char RestartReallyRequired1[]   PROGMEM = "power adapter   ";
 
 const char* const StringTable[] PROGMEM = 
 { 
@@ -66,6 +73,13 @@ const char* const StringTable[] PROGMEM =
   PreviewColorsNo,           //18
   SelectSpeed0,              //19
   SelectSpeed1,              //1A
+  LedStripType,              //1B
+  LedStripTypeRGB,           //1C 
+  LedStripTypeRGBW,          //1D 
+  RestartRequired0,          //1E
+  RestartRequired1,          //1F
+  RestartReallyRequired0,    //20
+  RestartReallyRequired1     //21
 };
 
 #endif
