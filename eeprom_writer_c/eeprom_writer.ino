@@ -1,97 +1,107 @@
 #include <Wire.h>
-#include <LiquidCrystal.h>
-
-#define LCD_RS 8
-#define LCD_EN 11
-#define LCD_D4 4
-#define LCD_D5 5
-#define LCD_D6 6
-#define LCD_D7 7
 
 #define EEPROM0_ADDRESS 0x50
 
-#define MAX_LED_NUM 225
 #define MAX_IMG_LEN 225
 
-LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+static const uint16_t Pattern2ColorAddress   = 0x0000;
+static const uint16_t Pattern4ColorAddress   = 0x2000;
+static const uint16_t Schemas2ColorAddress   = 0x6000;
+static const uint16_t SelectedPatternAddress = 0x6240;
+static const uint16_t Selected2ColorAddress  = 0x6241;
+static const uint16_t Selected4ColorAddress  = 0x6242;
+static const uint16_t SelectedSpeedAddress   = 0x6243;
+static const uint16_t LedCountAddress        = 0x6244; 
+static const uint16_t PreviewLedAddress      = 0x6245; 
+static const uint16_t IsRgbwTypeLedAddress   = 0x6246; 
 
-String command;
-volatile int writeIndex = 0x0;
-volatile int schemaIndex = 0;
+//volatile int writeIndex = Pattern2ColorAddress;
+volatile int writeIndex = Pattern4ColorAddress;
 
-void setup() {
-  // put your setup code here, to run once:
+void setup() 
+{
   Serial.begin(9600);
   Wire.begin();
-
-  lcd.begin(20, 4);
-  lcd.clear();
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  wipeOutChip();
 }
 
-void loop() {
-
-  // put your main code here, to run repeatedly:
-  if (Serial.available() > 0) {
-    command = Serial.readStringUntil('\n');
-    lcd.setCursor(0, 0);
-    lcd.print(command.substring(0, 19));
-    if(writeIndex == MAX_IMG_LEN + 1)
-    {
-      schemaIndex++;
-      writeIndex = 0;
-    }
-    lcd.setCursor(0, 1);
-    lcd.print(writeIndex);
-    lcd.print(" ");
-    lcd.print(schemaIndex);
-    saveSchema(schemaIndex, writeIndex++, command);
+void loop() 
+{
+  if (Serial.available() > 0) 
+  {
+    String command = Serial.readStringUntil('\n');
+    //saveSchema32(writeIndex, command);
+    saveSchema64(writeIndex, command);
+    //writeIndex += 0x20;
+    writeIndex += 0x40;
   }
+
   delay(50);
 }
 
-void saveSchema(int schemaIndex, int schemaRow, String row)
-{  
-  int baseAddress = schemaIndex * 32 * (MAX_IMG_LEN + 1); //32 (256/8) * (225 + 1 for header);
-  if(schemaRow == 0) //Schema header
-    for(int i = 0; i < 20; i++)
-    {
-      writeRow(2, "value ");
-      lcd.print((byte)row[i]);     
-      lcd.print(" ");
-      lcd.print(baseAddress + i);           
-      writeEEPROM(EEPROM0_ADDRESS, baseAddress + i, (byte)row[i]);
-      byte readValue = readEEPROM(EEPROM0_ADDRESS, baseAddress + i);
-      if(readValue != (byte)row[i])
-        writeRow(3, "VALIDATION ERROR");
-    }
-  else
+void wipeOutChip()
+{
+  for (int i = Schemas2ColorAddress; i < SelectedPatternAddress; i++)
   {
-    byte line[32];
-    memset(line, 0, sizeof(line));
-    for(int i = 0; i < MAX_LED_NUM; i++)
+    writeEEPROM(EEPROM0_ADDRESS, i, 0);
+    if (i % 0x100 == 0)
     {
-      unsigned int color = row[i] == '0' ? 0 : 1; 
-      line[i/8] = line[i/8] | color << i % 8;
+      digitalWrite(LED_BUILTIN, HIGH); 
+      delay(500);                     
+      digitalWrite(LED_BUILTIN, LOW);
     }
-    baseAddress += 32 * schemaRow; 
-    for(int i = 0; i < 32; i++)
-    {
-      writeRow(2, "A "); 
-      lcd.print(" ");
-      lcd.print(baseAddress + i);   
-      lcd.print("   ");  
-      writeEEPROM(EEPROM0_ADDRESS, baseAddress + i, (byte)line[i]);
-      byte readValue = readEEPROM(EEPROM0_ADDRESS, baseAddress + i);
-      if(readValue != (byte)line[i])
-        writeRow(3, "VALIDATION ERROR");
-    }
-  } 
+  }
+  writeEEPROM(EEPROM0_ADDRESS, SelectedPatternAddress, 0);
+  writeEEPROM(EEPROM0_ADDRESS, Selected2ColorAddress, 0);
+  writeEEPROM(EEPROM0_ADDRESS, Selected4ColorAddress, 0);
+  writeEEPROM(EEPROM0_ADDRESS, SelectedSpeedAddress, 1);
+  writeEEPROM(EEPROM0_ADDRESS, LedCountAddress, 1);
+  writeEEPROM(EEPROM0_ADDRESS, PreviewLedAddress, 0);
+  writeEEPROM(EEPROM0_ADDRESS, IsRgbwTypeLedAddress, 1);
+  digitalWrite(LED_BUILTIN, HIGH); 
 }
 
-void writeRow(int rownum, String text)
-{
-  lcd.setCursor(0, rownum);
-  lcd.print(text);
+void saveSchema64(int baseAddress, String row)
+{  
+  uint8_t line[64];
+  memset(line, 0, sizeof(line));
+  for(int i = 0; i < MAX_IMG_LEN; i++)
+  {
+    uint8_t color;
+    switch(row[i])
+    {
+      case '0':
+        color = 0;
+        break;
+      case '1':
+        color = 1;
+        break;
+      case '2':
+        color = 2;
+        break;
+      case '3':
+        color = 3;
+        break;
+    } 
+    line[i/4] = line[i/4] | color << (i * 2) % 8;
+  }
+  for(int i = 0; i < 0x40; i++)
+    writeEEPROM(EEPROM0_ADDRESS, baseAddress + i, (byte)line[i]);
+}
+
+void saveSchema32(int baseAddress, String row)
+{  
+  uint8_t line[32];
+  memset(line, 0, sizeof(line));
+  for(int i = 0; i < MAX_IMG_LEN; i++)
+  {
+    unsigned int color = row[i] == '0' ? 0 : 1; 
+    line[i/8] = line[i/8] | color << i % 8;
+  }
+  for(int i = 0; i < 0x20; i++)
+    writeEEPROM(EEPROM0_ADDRESS, baseAddress + i, (byte)line[i]);
 }
 
 void writeEEPROM(int deviceaddress, unsigned int eeaddress, byte data) 
@@ -102,21 +112,11 @@ void writeEEPROM(int deviceaddress, unsigned int eeaddress, byte data)
   Wire.write(data);
   Wire.endTransmission();
 
-  delay(10);
-}
-
-byte readEEPROM(int deviceaddress, unsigned int eeaddress) 
-{
-  byte rdata = 0x00;
- 
-  Wire.beginTransmission(deviceaddress);
-  Wire.write((int)(eeaddress >> 8));   // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.endTransmission();
- 
-  Wire.requestFrom(deviceaddress, 1);
-  if (Wire.available()) 
-    rdata = Wire.read();
-
-  return rdata;
+  uint8_t busStatus = 0xFF;
+  do       
+  {
+    Wire.beginTransmission(deviceaddress);
+    busStatus = Wire.endTransmission();
+  }
+  while (busStatus != 0x00);
 }
