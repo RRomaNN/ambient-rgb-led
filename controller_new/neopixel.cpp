@@ -5,7 +5,7 @@ NeoPixel::NeoPixel(uint8_t led_count)
   this->led_count = led_count;
 
   //neopixel = new Adafruit_NeoPixel(led_count, LED_STRIP_PIN, NEO_GRBW + NEO_KHZ800); //RGBW version
-  neopixel = new Adafruit_NeoPixel(led_count, LED_STRIP_PIN, NEO_GRB + NEO_KHZ800);
+  neopixel = new Adafruit_NeoPixel(led_count == 0 ? 1 : led_count, LED_STRIP_PIN, NEO_GRB + NEO_KHZ800);
   neopixel->begin();
   neopixel->setBrightness(DEFAULT_LED_BRIGHTNESS);
 }

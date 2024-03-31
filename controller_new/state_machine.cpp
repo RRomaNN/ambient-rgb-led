@@ -1,6 +1,6 @@
 #include "state_machine.hpp"
 
-StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count, bool preview_colors)
+StateMachine::StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors)
 {
   current_mode = BackgroundMode;
 
@@ -204,7 +204,7 @@ uint8_t StateMachine::GetSelectedPattern()
   return selected_pattern;
 }
 
-uint16_t StateMachine::GetSelectedSpeed()
+uint8_t StateMachine::GetSelectedSpeed()
 {
   return selected_speed;
 }
@@ -237,6 +237,11 @@ bool StateMachine::GetPreviewColorMode()
 bool StateMachine::IsRenderingEnabled()
 {
   return preview_colors || current_mode == BackgroundMode;
+}
+
+uint16_t StateMachine::GetLogarithmicSpeed()
+{
+  return (uint16_t) pow(2., (float)selected_speed / 10);
 }
 
 void StateMachine::GetSelected2Colors(uint32_t* color_a, uint32_t* color_b)

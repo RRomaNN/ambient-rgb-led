@@ -17,6 +17,7 @@ class Menu
     void ColorToHexString(uint8_t* color, uint8_t len, char* buffer);
     void PrintColorSetMode(uint32_t set_color_0, uint32_t set_color_1, uint8_t color_setting_phase, uint8_t page);
     void PrintLedSettings(uint8_t led_count);
+    void Print5DigitNumber(uint16_t number, char* buffer);
     void Print3DigitNumber(uint16_t number, char* buffer);
     void Print2DigitNumber(uint8_t number, char* buffer);
     void PrintSpeedSettings(uint16_t speed);

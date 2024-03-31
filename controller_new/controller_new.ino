@@ -45,8 +45,7 @@ void setup()
     global_lock = true;
   }
 
-  uint8_t selected_pattern, selected_color2, selected_color4, strip_led_count;
-  uint16_t selected_speed;
+  uint8_t selected_pattern, selected_color2, selected_color4, strip_led_count, selected_speed;
   bool preview_colors;
   eeprom->ReadSavedSettings(&selected_pattern, &selected_color2, &selected_color4, &selected_speed, &strip_led_count, &preview_colors);
 

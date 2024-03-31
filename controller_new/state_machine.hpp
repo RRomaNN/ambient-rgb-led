@@ -8,10 +8,10 @@ static const uint8_t ColorCount = 32;
 
 static const uint8_t ColorSetPhaseCount = 6;
 
-static const uint8_t  StrongColorIncreaseDelta = 0x10;
+static const uint8_t StrongColorIncreaseDelta = 0x10;
 
-static const uint8_t  FastSpeedChangeDelta = 0x20;
-static const uint16_t SlowestChangeSpeed = 0x200;
+static const uint8_t FastSpeedChangeDelta = 10;
+static const uint8_t SlowestChangeSpeed = 159;
 
 static const uint8_t FastLedCountChangeDelta = 0x10;
 static const uint8_t MaxLedCount = 225;
@@ -19,7 +19,7 @@ static const uint8_t MaxLedCount = 225;
 class StateMachine
 {
   public:
-    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t led_count, bool preview_colors);
+    StateMachine(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t led_count, bool preview_colors);
 
     //Types
     enum ModeType 
@@ -47,7 +47,8 @@ class StateMachine
     void TransitState(ActionType action);
     ModeType GetCurrentMode();
     uint8_t GetSelectedPattern();
-    uint16_t GetSelectedSpeed();
+    uint8_t GetSelectedSpeed();
+    uint16_t GetLogarithmicSpeed();
     uint8_t GetSelectedColor2Option();
     uint8_t GetSelectedColor4Option();
     uint8_t GetSelectedLedCount();
@@ -69,7 +70,7 @@ class StateMachine
     uint8_t selected_pattern;
     uint8_t selected_color2;
     uint8_t selected_color4;
-    uint16_t selected_speed;
+    uint8_t selected_speed;
     uint8_t led_count;
     bool preview_colors;
 

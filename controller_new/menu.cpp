@@ -6,6 +6,38 @@ Menu::Menu(LPLcd lcd, LPStateMachine state_machine)
   this->state_machine = state_machine;
 }
 
+void Menu::Print5DigitNumber(uint16_t number, char* buffer)
+{
+  if (number < 10)
+  {
+    buffer[0x0] = '0';
+    buffer[0x1] = '0';
+    buffer[0x2] = '0';
+    buffer[0x3] = '0';
+    itoa(number, buffer + 0x4, 10);
+  }
+  else if (number < 100)
+  {
+    buffer[0x0] = '0';
+    buffer[0x1] = '0';
+    buffer[0x2] = '0';
+    itoa(number, buffer + 0x3, 10);
+  }
+  else if (number < 1000)
+  {
+    buffer[0x0] = '0';
+    buffer[0x1] = '0';
+    itoa(number, buffer + 0x2, 10);
+  }
+  else if (number < 10000)
+  {
+    buffer[0x0] = '0';
+    itoa(number, buffer + 0x1, 10);
+  }
+  else 
+    itoa(number, buffer + 0x0, 10);
+}
+
 void Menu::Print3DigitNumber(uint16_t number, char* buffer)
 {
   if (number < 10)
@@ -154,8 +186,8 @@ void Menu::PrintLedSettings(uint8_t led_count)
 
 void Menu::PrintSpeedSettings(uint16_t speed)
 {
-  char buffer[4];
-  Print3DigitNumber(speed, buffer);
+  char buffer[6];
+  Print5DigitNumber(speed, buffer);
   lcd->PrintPlaySpeedWindow(buffer);
 }
 
@@ -195,7 +227,7 @@ void Menu::RenderCurrentState(float current_amps)
       PrintColorSetMode(color_c, color_d, color_setting_phase, 1);
       break;
     case StateMachine::SpeedSelectMode:
-      PrintSpeedSettings(speed);
+      PrintSpeedSettings(state_machine->GetLogarithmicSpeed());
       break;
     case StateMachine::PreviewColorMode:
       lcd->PrintPreviewColorsWindow(preview_colors);

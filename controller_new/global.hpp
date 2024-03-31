@@ -34,6 +34,8 @@ const static char ColorSettingBlue1[]        PROGMEM = "Set blue  ";
 const static char PreviewColorsH[]           PROGMEM = "Preview colors ?";
 const static char PreviewColorsYes[]         PROGMEM = "<      Yes     >";
 const static char PreviewColorsNo[]          PROGMEM = "<      No      >";
+const static char SelectSpeed0[]             PROGMEM = "<    ";
+const static char SelectSpeed1[]             PROGMEM =           "     >";
 
 const char* const StringTable[] PROGMEM = 
 { 
@@ -61,7 +63,9 @@ const char* const StringTable[] PROGMEM =
   ColorSettingBlue1,         //15 
   PreviewColorsH,            //16
   PreviewColorsYes,          //17
-  PreviewColorsNo            //18
+  PreviewColorsNo,           //18
+  SelectSpeed0,              //19
+  SelectSpeed1,              //1A
 };
 
 #endif

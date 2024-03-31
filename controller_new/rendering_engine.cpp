@@ -116,7 +116,7 @@ inline void RendringEngine::Render4Colors(uint8_t next_row, uint8_t led_count, f
 void RendringEngine::Render()
 {
   uint8_t pattern = state_machine->GetSelectedPattern();
-  uint16_t speed = state_machine->GetSelectedSpeed();
+  uint16_t speed = state_machine->GetLogarithmicSpeed();
   uint16_t led_count = state_machine->GetSelectedLedCount();
   uint8_t next_row = (current_row == ImageRowCount - 1) ? 0x00 : current_row + 1;
   float newFraction = (float)current_counter / speed;

@@ -15,9 +15,9 @@ static const uint16_t Schemas4ColorAddress   = 0x60C0;
 static const uint16_t SelectedPatternAddress = 0x6240;
 static const uint16_t Selected2ColorAddress  = 0x6241;
 static const uint16_t Selected4ColorAddress  = 0x6242;
-static const uint16_t SelectedSpeedAddress   = 0x6243; //uint16_t
-static const uint16_t LedCountAddress        = 0x6245; 
-static const uint16_t PreviewLedAddress      = 0x6246; 
+static const uint16_t SelectedSpeedAddress   = 0x6243;
+static const uint16_t LedCountAddress        = 0x6244; 
+static const uint16_t PreviewLedAddress      = 0x6245; 
 
 class Eeprom
 {
@@ -25,8 +25,8 @@ class Eeprom
     Eeprom();
 
     uint8_t Ping();
-    void ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint16_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors);
-    void SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint16_t selected_speed, uint8_t selected_led_count, bool preview_colors);
+    void ReadSavedSettings(uint8_t* selected_pattern, uint8_t* selected_color2, uint8_t* selected_color4, uint8_t* selected_speed, uint8_t* selected_led_count, bool* preview_colors);
+    void SaveSettings(uint8_t selected_pattern, uint8_t selected_color2, uint8_t selected_color4, uint8_t selected_speed, uint8_t selected_led_count, bool preview_colors);
     void ReadColor2Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b);
     void ReadColor4Schema(uint8_t color_num, uint32_t* color_a, uint32_t* color_b, uint32_t* color_c, uint32_t* color_d);
     void SaveColor2Schema(uint8_t color_num, uint32_t color_a, uint32_t color_b);
@@ -35,10 +35,8 @@ class Eeprom
 
   private:
     uint8_t ReadByte(int address);
-    uint16_t ReadUint16(int address);
     uint32_t ReadUint24(int address);
     void WriteByte(int address, uint8_t data);
-    void WriteUint16(int address, uint16_t data);
     void WriteUint24(int address, uint32_t data);
     void ReadDataBlock(int address, uint8_t* data);
 };
