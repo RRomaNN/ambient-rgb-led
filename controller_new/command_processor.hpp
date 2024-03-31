@@ -4,11 +4,12 @@
 #include "state_machine.hpp"
 #include "eeprom.hpp"
 #include "rendering_engine.hpp"
+#include "led_indicator.hpp"
 
 class CommandProcessor
 {
   public:
-    CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine);
+    CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine, LPLedIndicator led_indicatior);
     void ProcessStateChanges();
 
   private:
@@ -21,6 +22,7 @@ class CommandProcessor
     LPStateMachine state_machine;
     LPEeprom eeprom;
     LPRendringEngine rendering_engine;
+    LPLedIndicator led_indicatior;
 
     StateMachine::ModeType previous_mode;
     uint8_t previous_selected_color2;

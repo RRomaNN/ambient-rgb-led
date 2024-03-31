@@ -1,10 +1,11 @@
 #include "command_processor.hpp"
 
-CommandProcessor::CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine)
+CommandProcessor::CommandProcessor(LPStateMachine state_machine, LPEeprom eeprom, LPRendringEngine rendering_engine, LPLedIndicator led_indicatior)
 {
   this->state_machine = state_machine;
   this->eeprom = eeprom;
   this->rendering_engine = rendering_engine;
+  this->led_indicatior = led_indicatior;
 
   previous_mode = StateMachine::BackgroundMode;
 }
@@ -97,6 +98,7 @@ void CommandProcessor::ProcessStateChanges()
     SaveColor(current_mode);
 
     previous_mode = current_mode;
+    led_indicatior->Blink(1, SHORT_SIGNAL_MS, SHORT_SIGNAL_MS);
   }
   else
   {

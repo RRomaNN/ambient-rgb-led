@@ -59,7 +59,7 @@ void setup()
 
   neopixel = new NeoPixel(strip_led_count, is_rgbw_strip);
   rendering_engine = new RendringEngine(state_machine, eeprom, neopixel);
-  command_processor = new CommandProcessor(state_machine, eeprom, rendering_engine);
+  command_processor = new CommandProcessor(state_machine, eeprom, rendering_engine, led_indicatior);
   menu = new Menu(lcd, state_machine);
       
   led_indicatior->Blink(3, SHORT_SIGNAL_MS, SHORT_SIGNAL_MS);
