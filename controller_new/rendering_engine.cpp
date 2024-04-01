@@ -222,7 +222,7 @@ void RendringEngine::Render()
       Render4ColorsRgb(next_row, led_count, newFraction, oldFraction);   
   }
 
-  current_counter = (current_counter == speed) ? 0 : current_counter + 1;
+  current_counter = (current_counter >= speed) ? 0 : current_counter + 1;
   if (current_counter == 0)
     current_row = (current_row == ImageRowCount - 1) ? 0x00 : current_row + 1;
 }
