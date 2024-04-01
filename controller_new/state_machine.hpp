@@ -11,7 +11,7 @@ static const uint8_t ColorSetPhaseCount = 6;
 static const uint8_t StrongColorIncreaseDelta = 0x10;
 
 static const uint8_t FastSpeedChangeDelta = 10;
-static const uint8_t SlowestChangeSpeed = 159;
+static const uint8_t SlowestChangeSpeed = 149;
 
 static const uint8_t FastLedCountChangeDelta = 0x10;
 static const uint8_t MaxLedCount = 225;

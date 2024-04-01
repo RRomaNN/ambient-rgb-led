@@ -266,7 +266,9 @@ bool StateMachine::IsRenderingEnabled()
 
 uint16_t StateMachine::GetLogarithmicSpeed()
 {
-  return (uint16_t) pow(2., (float)selected_speed / 10);
+  return (selected_speed < 59)
+    ? selected_speed + 1
+    : (uint16_t) pow(2., (float)(selected_speed + 1) / 10);
 }
 
 bool StateMachine::IsRgbwStrip()
