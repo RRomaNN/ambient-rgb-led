@@ -78,7 +78,10 @@ void loop()
   if (state_machine->IsRenderingEnabled())
     rendering_engine->Render();
   else
+  {
     neopixel->ShutDown();
+    delay(10);
+  }
 
   if (menu_counter == 0xFF || need_to_refresh_menu)
   {
